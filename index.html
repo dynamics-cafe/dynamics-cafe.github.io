@@ -41,44 +41,127 @@
 
   <div class="trajectory-background" aria-hidden="true">
 
-  <svg class="phase-field phase-field-one"
-       viewBox="0 0 1200 650"
-       preserveAspectRatio="none">
+  <svg
+    class="phase-portrait"
+    viewBox="0 0 1200 650"
+    preserveAspectRatio="xMidYMid slice"
+  >
 
-    <path class="orbit orbit-teal"
-      d="M-80,470
-         C110,120 285,90 420,285
-         C535,450 675,500 825,330
-         C970,165 1080,145 1280,285" />
+    <defs>
 
-    <path class="orbit orbit-indigo"
-      d="M-80,520
-         C145,215 275,160 445,300
-         C600,425 690,425 850,270
-         C1010,115 1110,190 1280,365" />
+      <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#007C99" />
+        <stop offset="50%" stop-color="#00A6C7" />
+        <stop offset="100%" stop-color="#35C6D8" />
+      </linearGradient>
 
-    <path class="orbit orbit-amber"
-      d="M-100,385
-         C100,260 225,65 430,185
-         C600,285 590,535 815,425
-         C1030,320 1070,70 1290,170" />
+      <linearGradient id="violet-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#5138C4" />
+        <stop offset="55%" stop-color="#7257E8" />
+        <stop offset="100%" stop-color="#9A82FF" />
+      </linearGradient>
 
-  </svg>
+      <linearGradient id="coral-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#D95B43" />
+        <stop offset="55%" stop-color="#E76F51" />
+        <stop offset="100%" stop-color="#F2A65A" />
+      </linearGradient>
+
+    </defs>
 
 
-  <svg class="phase-field phase-field-two"
-       viewBox="0 0 1200 650"
-       preserveAspectRatio="none">
+    <!-- Cyan family -->
 
-    <path class="orbit orbit-faint"
-      d="M-120,180
-         C160,600 390,20 615,340
-         C790,590 960,70 1300,430" />
+    <g class="trajectory-family cyan-family">
 
-    <path class="orbit orbit-faint orbit-offset"
-      d="M-120,250
-         C170,645 430,80 620,390
-         C790,635 1000,130 1300,490" />
+      <path
+        class="trajectory-base"
+        stroke="url(#cyan-gradient)"
+        d="M-100 500
+           C100 80 300 120 410 320
+           C500 485 650 510 790 315
+           C910 145 1050 120 1300 335"
+      />
+
+      <path
+        class="trajectory-flow flow-fast"
+        stroke="#45D6E8"
+        d="M-100 500
+           C100 80 300 120 410 320
+           C500 485 650 510 790 315
+           C910 145 1050 120 1300 335"
+      />
+
+    </g>
+
+
+    <!-- Violet family -->
+
+    <g class="trajectory-family violet-family">
+
+      <path
+        class="trajectory-base"
+        stroke="url(#violet-gradient)"
+        d="M-120 190
+           C130 560 320 70 540 280
+           C690 425 760 510 930 285
+           C1070 100 1160 220 1320 440"
+      />
+
+      <path
+        class="trajectory-flow flow-medium"
+        stroke="#9A82FF"
+        d="M-120 190
+           C130 560 320 70 540 280
+           C690 425 760 510 930 285
+           C1070 100 1160 220 1320 440"
+      />
+
+    </g>
+
+
+    <!-- Coral family -->
+
+    <g class="trajectory-family coral-family">
+
+      <path
+        class="trajectory-base"
+        stroke="url(#coral-gradient)"
+        d="M-120 390
+           C90 330 215 85 420 175
+           C610 260 580 535 805 430
+           C1010 335 1080 75 1320 160"
+      />
+
+      <path
+        class="trajectory-flow flow-slow"
+        stroke="#FFA36B"
+        d="M-120 390
+           C90 330 215 85 420 175
+           C610 260 580 535 805 430
+           C1010 335 1080 75 1320 160"
+      />
+
+    </g>
+
+
+    <!-- A few quieter secondary trajectories -->
+
+    <path
+      class="secondary-trajectory"
+      d="M-80 570
+         C190 220 350 240 505 390
+         C670 545 880 395 1010 220
+         C1110 85 1240 120 1320 200"
+    />
+
+    <path
+      class="secondary-trajectory secondary-two"
+      d="M-100 110
+         C130 360 330 450 520 220
+         C680 25 855 95 965 335
+         C1040 500 1190 490 1320 360"
+    />
 
   </svg>
 
