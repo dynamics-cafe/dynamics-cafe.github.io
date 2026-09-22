@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Events — Dynamics Cafe ☕</title>
+
+  <meta
+    name="description"
+    content="Selected conferences, workshops, schools and research events related to dynamical systems and its applications."
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+
+    /* ==================================================
+       Events page
+       ================================================== */
+
+    .events-intro {
+      max-width: 760px;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+
+    .events-note {
+      max-width: 760px;
+    }
+
+    .events-submit {
+      margin-top: 28px;
+      padding: 20px 22px;
+      border-left: 3px solid var(--cyan);
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .events-submit p {
+      margin: 0;
+    }
+
+
+    /* Filters */
+
+    .event-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 36px 0 32px;
+    }
+
+    .filter-button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      padding: 9px 15px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .filter-button:hover {
+      border-color: var(--ink);
+    }
+
+    .filter-button.active {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+
+
+    /* Event grid */
+
+    .events-grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .external-event {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .external-event:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(23, 32, 51, 0.07);
+    }
+
+    .event-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .event-type {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46a5;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .event-status {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .external-event h2 {
+      margin: 0 0 12px;
+      font-size: 1.45rem;
+      line-height: 1.25;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin-bottom: 20px;
+      color: #4b5563;
+      font-size: 0.96rem;
+    }
+
+    .event-meta span {
+      display: inline-block;
+    }
+
+
+    /* Deadlines */
+
+    .deadlines {
+      margin: 18px 0 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .deadlines-title {
+      margin: 0 0 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .deadline-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .deadline-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 0.92rem;
+    }
+
+    .deadline-date {
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .deadline-item.next-deadline {
+      color: var(--coral);
+    }
+
+    .deadline-item.expired {
+      color: #9ca3af;
+    }
+
+
+    /* Event link */
+
+    .event-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .event-link:hover {
+      text-decoration: underline;
+    }
+
+
+    /* Loading / empty messages */
+
+    .events-message {
+      padding: 30px 0;
+      color: var(--muted);
+    }
+
+    .events-error {
+      padding: 20px;
+      border: 1px solid #fecaca;
+      background: #fff7f7;
+      border-radius: 10px;
+      color: #991b1b;
+    }
+
+
+    /* Mobile */
+
+    @media (max-width: 650px) {
+
+      .external-event {
+        padding: 22px;
+      }
+
+      .event-topline {
+        display: block;
+      }
+
+      .event-status {
+        margin-top: 8px;
+        text-align: left;
+      }
+
+      .deadline-item {
+        display: block;
+      }
+
+      .deadline-date {
+        display: block;
+        margin-top: 2px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+<header>
+  <div class="container">
+
+    <nav>
+
+      <a class="logo" href="/">
+        <img src="logo.png" alt="" class="nav-logo">
+        <span>Dynamics Cafe ☕</span>
+      </a>
+
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/#seminars">Seminars</a>
+        <a href="events.html">Events</a>
+        <a href="/#past">Past seminars</a>
+        <a href="/#about">About</a>
+      </div>
+
+    </nav>
+
+  </div>
+</header>
+
+
+<main>
+
+  <section>
+
+    <div class="container">
+
+      <h1>Conferences, Workshops & Schools</h1>
+
+      <p class="events-intro">
+        A curated selection of upcoming events related to dynamical systems,
+        from theory to applications across science and engineering.
+      </p>
+
+      <p class="events-note">
+        We include conferences, workshops, schools, courses and research
+        programs in dynamical systems and closely connected areas, including
+        applications in physics, biology, ecology, climate and ocean science,
+        medicine, engineering, control, data-driven modelling and scientific
+        machine learning.
+      </p>
+
+      <p class="events-note">
+        Events are listed only once they have been officially announced and
+        have an official event webpage. Details and deadlines may change, so
+        please check the linked organizer website before making plans.
+      </p>
+
+
+      <div class="events-submit">
+
+        <p>
+          <strong>Know of an event we should include?</strong><br>
+          We may miss things along the way. Send us the official event link at
+          <a href="mailto:dynamics.cafe.seminars@gmail.com">
+            dynamics.cafe.seminars@gmail.com
+          </a>.
+        </p>
+
+      </div>
+
+
+      <div
+        class="event-filters"
+        id="event-filters"
+        aria-label="Filter events"
+      >
+
+        <button
+          class="filter-button active"
+          data-filter="all"
+          type="button"
+        >
+          All
+        </button>
+
+        <button
+          class="filter-button"
+          data-filter="conference"
+          type="button"
+        >
+          Conferences
+        </button>
+
+        <button
+          class="filter-button"
+          data-filter="workshop"
+          type="button"
+        >
+          Workshops
+        </button>
+
+        <button
+          class="filter-button"
+          data-filter="school"
+          type="button"
+        >
+          Schools & courses
+        </button>
+
+        <button
+          class="filter-button"
+          data-filter="program"
+          type="button"
+        >
+          Research programs
+        </button>
+
+      </div>
+
+
+      <div id="events-container">
+
+        <p class="events-message">
+          Loading events…
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  <div class="container footer-content">
+
+    <p>
+      <strong>Dynamics Cafe ☕</strong><br>
+      Where dynamics meet caffeine.
+    </p>
+
+    <p>
+      <a href="/">Home</a>
+      ·
+      <a href="mailto:dynamics.cafe.seminars@gmail.com">Contact</a>
+      ·
+      <a href="privacy.html">Privacy</a>
+      ·
+      <a
+        href="https://www.linkedin.com/company/dynamics-cafe/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        LinkedIn
+      </a>
+    </p>
+
+  </div>
+</footer>
+
+
+<script>
+
+  /* ==================================================
+     Dynamics Cafe event catalogue
+     ================================================== */
+
+  const EVENTS_FILE = "data/events.json";
+
+  let allEvents = [];
+  let currentFilter = "all";
+
+
+  /* --------------------------------------------------
+     Date helpers
+     -------------------------------------------------- */
+
+  function localDate(dateString) {
+
+    /*
+      Adding a local midnight avoids dates shifting by one
+      day because of UTC conversion.
+    */
+
+    return new Date(`${dateString}T00:00:00`);
+  }
+
+
+  function formatDate(dateString) {
+
+    const date = localDate(dateString);
+
+    return new Intl.DateTimeFormat(
+      "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      }
+    ).format(date);
+
+  }
+
+
+  function formatMonth(dateString) {
+
+    /*
+      Used when an organizer has announced only a month,
+      e.g. "January 2027".
+    */
+
+    const [year, month] = dateString.split("-");
+
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      1
+    );
+
+    return new Intl.DateTimeFormat(
+      "en-GB",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    ).format(date);
+
+  }
+
+
+  function formatEventDates(event) {
+
+    if (event.start === event.end) {
+      return formatDate(event.start);
+    }
+
+    const start = localDate(event.start);
+    const end = localDate(event.end);
+
+    const sameYear =
+      start.getFullYear() === end.getFullYear();
+
+    const sameMonth =
+      sameYear &&
+      start.getMonth() === end.getMonth();
+
+
+    if (sameMonth) {
+
+      const monthYear = new Intl.DateTimeFormat(
+        "en-GB",
+        {
+          month: "short",
+          year: "numeric"
+        }
+      ).format(start);
+
+      return `${start.getDate()}–${end.getDate()} ${monthYear}`;
+    }
+
+
+    if (sameYear) {
+
+      const startText = new Intl.DateTimeFormat(
+        "en-GB",
+        {
+          day: "numeric",
+          month: "short"
+        }
+      ).format(start);
+
+      const endText = new Intl.DateTimeFormat(
+        "en-GB",
+        {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        }
+      ).format(end);
+
+      return `${startText} – ${endText}`;
+    }
+
+
+    return `${formatDate(event.start)} – ${formatDate(event.end)}`;
+  }
+
+
+  /* --------------------------------------------------
+     Event categories
+     -------------------------------------------------- */
+
+  function eventCategory(type) {
+
+    const value = type.toLowerCase();
+
+    if (value.includes("conference")) {
+      return "conference";
+    }
+
+    if (value.includes("workshop")) {
+      return "workshop";
+    }
+
+    if (
+      value.includes("school") ||
+      value.includes("course")
+    ) {
+      return "school";
+    }
+
+    if (
+      value.includes("program") ||
+      value.includes("programme")
+    ) {
+      return "program";
+    }
+
+    return "other";
+  }
+
+
+  /* --------------------------------------------------
+     Deadline helpers
+     -------------------------------------------------- */
+
+  function deadlineDate(deadline) {
+
+    if (deadline.date_precision === "month") {
+
+      const [year, month] = deadline.date.split("-");
+
+      /*
+        Treat month-only deadlines as the final day of
+        that month for ordering purposes.
+      */
+
+      return new Date(
+        Number(year),
+        Number(month),
+        0,
+        23,
+        59,
+        59
+      );
+    }
+
+    return localDate(deadline.date);
+  }
+
+
+  function formatDeadline(deadline) {
+
+    if (deadline.date_precision === "month") {
+      return formatMonth(deadline.date);
+    }
+
+    return formatDate(deadline.date);
+  }
+
+
+  function getNextDeadlineIndex(deadlines) {
+
+    if (!deadlines || deadlines.length === 0) {
+      return -1;
+    }
+
+    const now = new Date();
+
+    let nextIndex = -1;
+    let nextDate = null;
+
+    deadlines.forEach((deadline, index) => {
+
+      const date = deadlineDate(deadline);
+
+      if (
+        date >= now &&
+        (nextDate === null || date < nextDate)
+      ) {
+
+        nextIndex = index;
+        nextDate = date;
+      }
+
+    });
+
+    return nextIndex;
+  }
+
+
+  /* --------------------------------------------------
+     Render one event
+     -------------------------------------------------- */
+
+  function createEventCard(event) {
+
+    const article = document.createElement("article");
+
+    article.className = "external-event";
+    article.dataset.category = eventCategory(event.type);
+
+
+    const topline = document.createElement("div");
+    topline.className = "event-topline";
+
+
+    const type = document.createElement("span");
+    type.className = "event-type";
+    type.textContent = event.type;
+
+
+    const status = document.createElement("span");
+    status.className = "event-status";
+    status.textContent = event.status || "";
+
+
+    topline.append(type, status);
+
+
+    const title = document.createElement("h2");
+    title.textContent = event.title;
+
+
+    const meta = document.createElement("div");
+    meta.className = "event-meta";
+
+
+    const dates = document.createElement("span");
+    dates.textContent = `📅 ${formatEventDates(event)}`;
+
+
+    const location = document.createElement("span");
+    location.textContent = `📍 ${event.location}`;
+
+
+    meta.append(dates, location);
+
+
+    article.append(
+      topline,
+      title,
+      meta
+    );
+
+
+    /* Deadlines */
+
+    if (
+      Array.isArray(event.deadlines) &&
+      event.deadlines.length > 0
+    ) {
+
+      const deadlineSection =
+        document.createElement("div");
+
+      deadlineSection.className = "deadlines";
+
+
+      const deadlineTitle =
+        document.createElement("p");
+
+      deadlineTitle.className = "deadlines-title";
+      deadlineTitle.textContent = "Important deadlines";
+
+
+      const deadlineList =
+        document.createElement("ul");
+
+      deadlineList.className = "deadline-list";
+
+
+      const nextDeadline =
+        getNextDeadlineIndex(event.deadlines);
+
+      const now = new Date();
+
+
+      event.deadlines.forEach(
+        (deadline, index) => {
+
+          const item =
+            document.createElement("li");
+
+          item.className = "deadline-item";
+
+
+          if (index === nextDeadline) {
+            item.classList.add("next-deadline");
+          }
+
+
+          if (deadlineDate(deadline) < now) {
+            item.classList.add("expired");
+          }
+
+
+          const label =
+            document.createElement("span");
+
+          label.textContent = deadline.label;
+
+
+          const date =
+            document.createElement("span");
+
+          date.className = "deadline-date";
+          date.textContent = formatDeadline(deadline);
+
+
+          item.append(label, date);
+          deadlineList.append(item);
+
+        }
+      );
+
+
+      deadlineSection.append(
+        deadlineTitle,
+        deadlineList
+      );
+
+      article.append(deadlineSection);
+    }
+
+
+    /* Official event link */
+
+    const link = document.createElement("a");
+
+    link.className = "event-link";
+    link.href = event.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Official event website →";
+
+
+    article.append(link);
+
+    return article;
+  }
+
+
+  /* --------------------------------------------------
+     Render event list
+     -------------------------------------------------- */
+
+  function renderEvents() {
+
+    const container =
+      document.getElementById("events-container");
+
+    container.innerHTML = "";
+
+
+    const filtered = allEvents.filter(event => {
+
+      if (currentFilter === "all") {
+        return true;
+      }
+
+      return eventCategory(event.type) === currentFilter;
+
+    });
+
+
+    if (filtered.length === 0) {
+
+      const message =
+        document.createElement("p");
+
+      message.className = "events-message";
+
+      message.textContent =
+        "No upcoming events in this category at the moment.";
+
+      container.append(message);
+
+      return;
+    }
+
+
+    const grid = document.createElement("div");
+    grid.className = "events-grid";
+
+
+    filtered.forEach(event => {
+      grid.append(createEventCard(event));
+    });
+
+
+    container.append(grid);
+  }
+
+
+  /* --------------------------------------------------
+     Filters
+     -------------------------------------------------- */
+
+  document
+    .querySelectorAll(".filter-button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".filter-button")
+            .forEach(item => {
+              item.classList.remove("active");
+            });
+
+
+          button.classList.add("active");
+
+          currentFilter =
+            button.dataset.filter;
+
+          renderEvents();
+
+        }
+      );
+
+    });
+
+
+  /* --------------------------------------------------
+     Load data/events.json
+     -------------------------------------------------- */
+
+  async function loadEvents() {
+
+    const container =
+      document.getElementById("events-container");
+
+    try {
+
+      const response = await fetch(
+        EVENTS_FILE,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+      if (!response.ok) {
+        throw new Error(
+          `Could not load ${EVENTS_FILE}`
+        );
+      }
+
+
+      const events = await response.json();
+
+
+      const today = new Date();
+
+      today.setHours(0, 0, 0, 0);
+
+
+      /*
+        Keep only events that have not yet ended.
+      */
+
+      allEvents = events
+        .filter(event => {
+
+          const end = localDate(event.end);
+
+          end.setHours(23, 59, 59, 999);
+
+          return end >= today;
+
+        })
+        .sort((a, b) => {
+
+          return (
+            localDate(a.start) -
+            localDate(b.start)
+          );
+
+        });
+
+
+      renderEvents();
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      container.innerHTML = `
+        <div class="events-error">
+          We could not load the event list right now.
+          Please try again later.
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  loadEvents();
+
+</script>
+
+
+</body>
+</html>
