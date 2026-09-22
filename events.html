@@ -9,7 +9,7 @@
 
   <meta
     name="description"
-    content="Selected conferences, workshops, schools and research events related to dynamical systems and its applications."
+    content="Selected conferences, workshops and schools related to dynamical systems and its applications."
   >
 
   <link rel="stylesheet" href="style.css">
@@ -296,11 +296,10 @@
       </p>
 
       <p class="events-note">
-        We include conferences, workshops, schools, courses and research
-        programs in dynamical systems and closely connected areas, including
-        applications in physics, biology, ecology, climate and ocean science,
-        medicine, engineering, control, data-driven modelling and scientific
-        machine learning.
+        We include conferences, workshops, schools and courses in dynamical 
+        systems and closely connected areas, including applications in physics,
+        biology, ecology, climate and ocean science, medicine, engineering, 
+        control, data-driven modelling and scientific machine learning.
       </p>
 
       <p class="events-note">
@@ -359,14 +358,6 @@
           type="button"
         >
           Schools & courses
-        </button>
-
-        <button
-          class="filter-button"
-          data-filter="program"
-          type="button"
-        >
-          Research programs
         </button>
 
       </div>
@@ -563,13 +554,6 @@
       value.includes("course")
     ) {
       return "school";
-    }
-
-    if (
-      value.includes("program") ||
-      value.includes("programme")
-    ) {
-      return "program";
     }
 
     return "other";
