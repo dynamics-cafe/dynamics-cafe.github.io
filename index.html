@@ -26,6 +26,7 @@
 
       <div class="links">
         <a href="#seminars">Seminars</a>
+        <a href="events.html">Events</a>
         <a href="#past">Past seminars</a>
         <a href="#about">About</a>
         <a href="#subscribe">Subscribe</a>
@@ -217,6 +218,29 @@
     </div>
   </section>
 
+  <section id="community-events">
+  <div class="container">
+
+    <h2>Around the dynamics community</h2>
+
+    <p class="section-intro">
+      Selected upcoming conferences, workshops, schools, and research events
+      related to dynamical systems and its applications.
+    </p>
+
+    <div id="home-events">
+      <p class="muted">Loading upcoming events…</p>
+    </div>
+
+    <div class="buttons">
+      <a class="button secondary" href="events.html">
+        Browse all events
+      </a>
+    </div>
+
+  </div>
+</section>
+
 
   <section id="past">
     <div class="container">
@@ -307,6 +331,95 @@
 
   </div>
 </footer>
+
+  <script>
+  async function loadHomeEvents() {
+    const container = document.getElementById("home-events");
+
+    try {
+      const response = await fetch("data/events.json", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not load events");
+      }
+
+      const events = await response.json();
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const upcoming = events
+        .filter(event => {
+          const end = new Date(`${event.end}T23:59:59`);
+          return end >= today;
+        })
+        .sort((a, b) => {
+          return new Date(a.start) - new Date(b.start);
+        })
+        .slice(0, 3);
+
+      if (upcoming.length === 0) {
+        container.innerHTML = `
+          <p class="muted">
+            No external events listed at the moment.
+          </p>
+        `;
+        return;
+      }
+
+      const list = document.createElement("div");
+      list.className = "seminar-list";
+
+      upcoming.forEach(event => {
+        const item = document.createElement("div");
+        item.className = "seminar-item";
+
+        const date = new Intl.DateTimeFormat(
+          "en-GB",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+          }
+        ).format(new Date(`${event.start}T00:00:00`));
+
+        item.innerHTML = `
+          <p class="muted">
+            ${event.type} · ${date} · ${event.location}
+          </p>
+
+          <h3>
+            <a
+              href="${event.url}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ${event.title}
+            </a>
+          </h3>
+        `;
+
+        list.append(item);
+      });
+
+      container.innerHTML = "";
+      container.append(list);
+
+    } catch (error) {
+      console.error(error);
+
+      container.innerHTML = `
+        <p class="muted">
+          Events are temporarily unavailable.
+        </p>
+      `;
+    }
+  }
+
+  loadHomeEvents();
+</script>
 
 </body>
 </html>
