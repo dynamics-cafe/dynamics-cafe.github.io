@@ -1,0 +1,225 @@
+[
+  {
+    "title": "New Frontiers in Rigidity, Flexibility and Complexity in Dynamics and Related Applications",
+    "type": "Research Program",
+    "location": "Singapore",
+    "start": "2027-01-04",
+    "end": "2027-02-05",
+    "deadlines": [],
+    "status": "registration open",
+    "url": "https://ims.nus.edu.sg/events/newfrontiers_applns/"
+  },
+  {
+    "title": "SMRI Summer School 2027: Rigidity, Geometry, Dynamics",
+    "type": "Summer School",
+    "location": "Sydney, Australia",
+    "start": "2027-01-18",
+    "end": "2027-01-29",
+    "deadlines": [],
+    "status": "registration of interest open",
+    "url": "https://mathematical-research-institute.sydney.edu.au/smri-summer-school-2027/"
+  },
+  {
+    "title": "European Conference on Scientific Machine Learning with Applications in Science and Engineering (ECSML 2027)",
+    "type": "Conference",
+    "location": "Naples, Italy",
+    "start": "2027-02-08",
+    "end": "2027-02-10",
+    "deadlines": [
+      {
+        "label": "Contributed presentation and poster abstract deadline",
+        "date": "2026-10-30"
+      },
+      {
+        "label": "Minisymposium proposal deadline",
+        "date": "2026-10-30"
+      },
+      {
+        "label": "Early-bird registration deadline",
+        "date": "2026-12-04"
+      }
+    ],
+    "status": "registration and submissions open",
+    "url": "https://sites.google.com/view/ecsml2027/home"
+  },
+  {
+    "title": "Göttingen Emergent Minds Winter School: Learning and Computation in Brains and Machines",
+    "type": "Winter School",
+    "location": "Göttingen, Germany",
+    "start": "2027-02-15",
+    "end": "2027-03-06",
+    "deadlines": [
+      {
+        "label": "Application deadline",
+        "date": "2026-10-01"
+      }
+    ],
+    "status": "applications open",
+    "url": "https://goemmi-goettingen.de/"
+  },
+  {
+    "title": "Detours and Shortcuts Outside Equilibrium",
+    "type": "Workshop",
+    "location": "Dresden, Germany",
+    "start": "2027-02-15",
+    "end": "2027-02-19",
+    "deadlines": [
+      {
+        "label": "Preferential application deadline",
+        "date": "2026-10-15"
+      }
+    ],
+    "status": "applications open",
+    "url": "https://www.pks.mpg.de/dash27"
+  },
+  {
+    "title": "Computer-Assisted Proofs in Delayed and Infinite-Dimensional Dynamical Systems",
+    "type": "Advanced Course",
+    "location": "Udine, Italy",
+    "start": "2027-05-03",
+    "end": "2027-05-07",
+    "deadlines": [
+      {
+        "label": "Early-bird registration and grant request deadline",
+        "date": "2027-03-03"
+      },
+      {
+        "label": "Final registration deadline",
+        "date": "2027-04-21"
+      }
+    ],
+    "status": "registration open",
+    "url": "https://www.cism.it/event/computer-assisted-proofs-in-delayed-and-infinite-dimensional-dynamical-systems-8447/admission"
+  },
+  {
+    "title": "New Frontiers in Dispersive Integrable Equations",
+    "type": "Workshop",
+    "location": "Pasadena, California, USA",
+    "start": "2027-05-10",
+    "end": "2027-05-14",
+    "deadlines": [
+      {
+        "label": "Participation and funding application deadline",
+        "date": "2026-12-01"
+      }
+    ],
+    "status": "applications open",
+    "url": "https://aimath.org/workshops/upcoming/dispersiveint/"
+  },
+  {
+    "title": "SIAM Conference on Applications of Dynamical Systems (DS27)",
+    "type": "Conference",
+    "location": "Atlanta, Georgia, USA",
+    "start": "2027-05-23",
+    "end": "2027-05-27",
+    "deadlines": [
+      {
+        "label": "Minisymposium proposal deadline",
+        "date": "2026-10-26"
+      },
+      {
+        "label": "Contributed lecture, poster, and minisymposium presentation abstract deadline",
+        "date": "2026-11-23"
+      },
+      {
+        "label": "Travel support application deadline",
+        "date": "2027-02-22"
+      },
+      {
+        "label": "Early registration deadline",
+        "date": "2027-04-26"
+      }
+    ],
+    "status": "submissions open",
+    "url": "https://www.siam.org/conferences-events/siam-conferences/ds27/"
+  },
+  {
+    "title": "8th IFAC Conference on Analysis and Control of Nonlinear Dynamics and Chaos (ACNDC 2027)",
+    "type": "Conference",
+    "location": "Monte Porzio Catone (Rome), Italy",
+    "start": "2027-06-09",
+    "end": "2027-06-11",
+    "deadlines": [
+      {
+        "label": "Invited session proposal deadline",
+        "date": "2026-10-14"
+      },
+      {
+        "label": "Regular paper submission deadline",
+        "date": "2026-10-30"
+      },
+      {
+        "label": "Late-breaking results deadline",
+        "date": "2027-02-05"
+      }
+    ],
+    "status": "submissions open",
+    "url": "https://conferences.ifac-control.org/acndc2027/"
+  },
+  {
+    "title": "Scientific Machine Learning Meets Uncertainty Quantification",
+    "type": "Workshop",
+    "location": "Singapore",
+    "start": "2027-06-21",
+    "end": "2027-06-25",
+    "deadlines": [],
+    "status": "registration open",
+    "url": "https://ims.nus.edu.sg/events/scientificmluq/"
+  },
+  {
+    "title": "Renormalized Volume, Dynamics and Discrete Groups",
+    "type": "Conference",
+    "location": "Marseille, France",
+    "start": "2027-06-28",
+    "end": "2027-07-02",
+    "deadlines": [],
+    "status": "pre-registration open",
+    "url": "https://conferences.cirm-math.fr/3731.html"
+  },
+  {
+    "title": "Dynamics, Equations and Applications 2027 (DEA 2027)",
+    "type": "Conference",
+    "location": "Kraków, Poland",
+    "start": "2027-06-28",
+    "end": "2027-07-02",
+    "deadlines": [],
+    "status": "pre-registration open",
+    "url": "https://www.dea.agh.edu.pl/"
+  },
+  {
+    "title": "9th IFAC Workshop on Lagrangian and Hamiltonian Methods for Nonlinear Control (LHMNC 2027)",
+    "type": "Workshop",
+    "location": "Mexico City, Mexico",
+    "start": "2027-06-30",
+    "end": "2027-07-02",
+    "deadlines": [
+      {
+        "label": "Submission deadline",
+        "date": "2027-01-18"
+      }
+    ],
+    "status": "submissions open",
+    "url": "https://ifac-control.org/conferences/lhmnc-2027/"
+  },
+  {
+    "title": "12th European Nonlinear Oscillations Conference (ENOC 2027)",
+    "type": "Conference",
+    "location": "Aberdeen, Scotland, United Kingdom",
+    "start": "2027-07-19",
+    "end": "2027-07-23",
+    "deadlines": [
+      {
+        "label": "Abstract submission deadline",
+        "date": "2027-01",
+        "date_precision": "month"
+      },
+      {
+        "label": "Early-bird registration deadline",
+        "date": "2027-05",
+        "date_precision": "month"
+      }
+    ],
+    "status": "abstract submissions open",
+    "url": "https://enoc2027.com/"
+  }
+]
