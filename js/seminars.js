@@ -1,5 +1,46 @@
 const SEMINARS_FILE = "data/seminars.json";
 
+// Convert a wall-clock time in an IANA zone (e.g. 14:00 Europe/Rome) to a
+// real instant, so daylight-saving changes are always handled correctly.
+function zonedToDate(dateStr, timeStr, timeZone) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const [hh, mm] = timeStr.split(":").map(Number);
+  const wanted = Date.UTC(y, m - 1, d, hh, mm);
+  let guess = wanted;
+
+  for (let i = 0; i < 2; i++) {
+    const parts = Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        hourCycle: "h23",
+        year: "numeric", month: "numeric", day: "numeric",
+        hour: "numeric", minute: "numeric"
+      }).formatToParts(new Date(guess)).map(p => [p.type, p.value])
+    );
+    const shown = Date.UTC(
+      +parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute
+    );
+    guess += wanted - shown;
+  }
+
+  return new Date(guess);
+}
+
+function formatTimeRange(start, minutes, timeZone) {
+  const end = new Date(start.getTime() + minutes * 60000);
+  const hm = {
+    timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+  };
+  const f = new Intl.DateTimeFormat("en-GB", hm);
+  const zoneName = (locale) => new Intl.DateTimeFormat(locale, {
+    timeZone, timeZoneName: "short"
+  }).formatToParts(start).find(p => p.type === "timeZoneName").value;
+  // prefer real abbreviations (CEST, EDT, BST) over "GMT+2"
+  let zone = zoneName("en-US");
+  if (/^(GMT|UTC)/.test(zone)) zone = zoneName("en-GB");
+  return `${f.format(start)}–${f.format(end)} ${zone}`;
+}
+
 async function loadNextSeminar() {
   const container = document.getElementById("next-seminar");
 
@@ -45,18 +86,35 @@ async function loadNextSeminar() {
     }
 
 
-    const date = new Intl.DateTimeFormat(
-      "en-GB",
-      {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }
-    ).format(
-      new Date(`${nextSeminar.date}T00:00:00`)
-    );
+    const tz = nextSeminar.timezone || "Europe/Rome";
+    const minutes = nextSeminar.duration_minutes || 60;
+    const hasTime = /^\d{1,2}:\d{2}$/.test(nextSeminar.time || "");
+    const start = zonedToDate(nextSeminar.date, hasTime ? nextSeminar.time : "00:00", tz);
 
+    const date = new Intl.DateTimeFormat("en-GB", {
+      timeZone: tz,
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
+    }).format(start);
+
+    const cityName = tz.split("/").pop().replace(/_/g, " ");
+    let timeLine = "";
+
+    if (hasTime) {
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const main = `${formatTimeRange(start, minutes, tz)} (${cityName} time)`;
+      let local = "";
+
+      if (localTz && localTz !== tz) {
+        const sameDay = new Intl.DateTimeFormat("en-GB", { timeZone: localTz, dateStyle: "short" }).format(start)
+          === new Intl.DateTimeFormat("en-GB", { timeZone: tz, dateStyle: "short" }).format(start);
+        const localDay = sameDay ? "" : new Intl.DateTimeFormat("en-GB", {
+          timeZone: localTz, weekday: "short", day: "numeric", month: "short"
+        }).format(start) + ", ";
+        local = `<br><span class="muted">Your local time: ${localDay}${formatTimeRange(start, minutes, localTz)}</span>`;
+      }
+
+      timeLine = `<br>${main}${local}`;
+    }
 
     const joinButton =
       nextSeminar.meeting_url &&
@@ -92,8 +150,7 @@ async function loadNextSeminar() {
       </p>
 
       <p>
-        <strong>${date}</strong>
-        ${nextSeminar.time ? ` · ${nextSeminar.time}` : ""}
+        <strong>${date}</strong>${timeLine}
       </p>
 
       ${joinButton}

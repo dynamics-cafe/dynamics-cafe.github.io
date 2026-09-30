@@ -1,7 +1,9 @@
 [
   {
     "date": "2026-10-09",
-    "time": "REPLACE_WITH_CONFIRMED_TIME",
+    "time": "14:00",
+    "timezone": "Europe/Rome",
+    "duration_minutes": 60,
     "title": "Noise-induced Excitability and Pulse Dynamics in Autotoxic Populations",
     "speaker": "Pablo Spilberg",
     "affiliation": "Department of Agricultural Sciences, University of Naples Federico II, Portici, Italy",
