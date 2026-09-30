@@ -760,11 +760,14 @@ footer a {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   gap: 0 48px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .event-who,
 .event-when {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* both halves centred on the same horizontal axis */
   min-width: 0;
 }
 
@@ -787,8 +790,8 @@ footer a {
 }
 
 .abstract-body {
-  columns: 2;
-  column-gap: 44px;
+  max-width: 76ch;
+  margin: 0 auto;
 }
 
 .event-grid .abstract-text {
@@ -821,7 +824,4 @@ footer a {
     border-top: 1px solid var(--line);
   }
 
-  .abstract-body {
-    columns: 1;
-  }
 }
