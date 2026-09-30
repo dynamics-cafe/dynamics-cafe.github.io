@@ -201,11 +201,11 @@ nav .links a:hover {
   animation: trajectory-flow 10s linear infinite;
 }
 
-.violet-family .trajectory-flow {
+.copper-family .trajectory-flow {
   animation-delay: -3.5s;
 }
 
-.coral-family .trajectory-flow {
+.caramel-family .trajectory-flow {
   animation-delay: -7s;
 }
 
@@ -255,7 +255,7 @@ nav .links a:hover {
   animation: breathe-caramel 16s ease-in-out infinite;
 }
 
-@keyframes breathe-cyan {
+@keyframes breathe-coffee {
   0%,
   100% {
     transform: translateY(0);
@@ -266,7 +266,7 @@ nav .links a:hover {
   }
 }
 
-@keyframes breathe-violet {
+@keyframes breathe-copper {
   0%,
   100% {
     transform: translateY(0);
@@ -277,7 +277,7 @@ nav .links a:hover {
   }
 }
 
-@keyframes breathe-coral {
+@keyframes breathe-caramel {
   0%,
   100% {
     transform: translateY(0);
