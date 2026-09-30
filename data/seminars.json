@@ -6,8 +6,17 @@
     "duration_minutes": 60,
     "title": "Noise-induced Excitability and Pulse Dynamics in Autotoxic Populations",
     "speaker": "Pablo Moreno-Spiegelberg",
-    "speaker_url": "https://scholar.google.com/citations?user=D0kt8BsAAAAJ&hl=en",
     "affiliation": "Department of Agricultural Sciences, University of Naples Federico II, Portici, Italy",
-    "meeting_url": "https://meet.google.com/zzr-odhh-ysd"
+    "meeting_url": "https://meet.google.com/zzr-odhh-ysd",
+    "speaker_links": [
+      {
+        "label": "Google Scholar",
+        "url": "https://scholar.google.com/citations?user=D0kt8BsAAAAJ&hl=en"
+      },
+      {
+        "label": "ResearchGate",
+        "url": "https://www.researchgate.net/profile/Pablo-Moreno-Spiegelberg"
+      }
+    ]
   }
 ]

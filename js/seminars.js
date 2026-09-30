@@ -116,9 +116,13 @@ async function loadNextSeminar() {
       timeLine = `<br>${main}${local}`;
     }
 
-    const speaker = nextSeminar.speaker_url
-      ? `<a class="speaker-link" href="${nextSeminar.speaker_url}" target="_blank" rel="noopener noreferrer">${nextSeminar.speaker}</a>`
-      : nextSeminar.speaker;
+    // profile links supplied by the speaker (Google Scholar, ResearchGate, website, ...)
+    const links = (nextSeminar.speaker_links || []).filter(l => l && l.url);
+    const speakerLinks = links.length
+      ? `<span class="speaker-links">${links.map(l =>
+          `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a>`
+        ).join("")}</span>`
+      : "";
 
     const joinButton =
       nextSeminar.meeting_url &&
@@ -149,9 +153,10 @@ async function loadNextSeminar() {
       </h3>
 
       <p>
-        <strong>${speaker}</strong><br>
+        <strong>${nextSeminar.speaker}</strong><br>
         ${nextSeminar.affiliation}
       </p>
+      ${speakerLinks}
 
       <p>
         <strong>${date}</strong>${timeLine}
