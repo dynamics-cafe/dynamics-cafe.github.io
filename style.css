@@ -312,6 +312,8 @@ section h2 {
 footer {
   padding: 35px 0;
   border-top: 1px solid var(--line);
+  background: rgba(255, 241, 214, 0.8);
+  backdrop-filter: blur(6px);
   color: var(--muted);
   font-size: 0.9rem;
 }
@@ -361,8 +363,8 @@ footer a {
 
 @media (max-width: 650px) {
   nav {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    gap: 12px;
   }
 
   .logo {
@@ -389,4 +391,19 @@ footer a {
   .footer-content p + p {
     margin-top: 18px;
   }
+}
+
+
+/* Speaker profile link */
+
+.speaker-link {
+  text-decoration: underline;
+  text-decoration-color: var(--copper);
+  text-underline-offset: 3px;
+}
+
+.speaker-link::after {
+  content: " ↗";
+  font-weight: 400;
+  color: var(--copper);
 }
