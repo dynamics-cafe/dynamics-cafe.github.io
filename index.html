@@ -60,7 +60,7 @@
 
     <defs>
 
-  <!-- Espresso → coffee → burnt orange -->
+  <!-- Espresso → roasted brown → coffee orange -->
   <linearGradient
     id="coffee-gradient"
     x1="0%"
@@ -68,12 +68,13 @@
     x2="100%"
     y2="100%"
   >
-    <stop offset="0%" stop-color="#4A1500" />
-    <stop offset="45%" stop-color="#8A3707" />
-    <stop offset="100%" stop-color="#D66A0A" />
+    <stop offset="0%" stop-color="#471904" />
+    <stop offset="48%" stop-color="#592106" />
+    <stop offset="100%" stop-color="#D57D2E" />
   </linearGradient>
 
-  <!-- Deep copper → orange → warm caramel -->
+
+  <!-- Dark roast → copper → caramel -->
   <linearGradient
     id="copper-gradient"
     x1="0%"
@@ -81,12 +82,13 @@
     x2="100%"
     y2="0%"
   >
-    <stop offset="0%" stop-color="#7A2900" />
-    <stop offset="48%" stop-color="#C45408" />
-    <stop offset="100%" stop-color="#F09A32" />
+    <stop offset="0%" stop-color="#592106" />
+    <stop offset="52%" stop-color="#D57D2E" />
+    <stop offset="100%" stop-color="#E1A462" />
   </linearGradient>
 
-  <!-- Espresso → amber → golden cream -->
+
+  <!-- Coffee brown → copper → latte caramel -->
   <linearGradient
     id="caramel-gradient"
     x1="0%"
@@ -94,12 +96,87 @@
     x2="100%"
     y2="100%"
   >
-    <stop offset="0%" stop-color="#351000" />
-    <stop offset="50%" stop-color="#A74305" />
-    <stop offset="100%" stop-color="#E9A34E" />
+    <stop offset="0%" stop-color="#7F5934" />
+    <stop offset="52%" stop-color="#D57D2E" />
+    <stop offset="100%" stop-color="#E1A462" />
   </linearGradient>
 
 </defs>
+
+
+<!-- Coffee family -->
+
+<g class="trajectory-family coffee-family">
+
+  <path
+    class="trajectory-base"
+    stroke="url(#coffee-gradient)"
+    d="M-100 500
+       C100 80 300 120 410 320
+       C500 485 650 510 790 315
+       C910 145 1050 120 1300 335"
+  />
+
+  <path
+    class="trajectory-flow flow-fast"
+    stroke="#D57D2E"
+    d="M-100 500
+       C100 80 300 120 410 320
+       C500 485 650 510 790 315
+       C910 145 1050 120 1300 335"
+  />
+
+</g>
+
+
+<!-- Copper family -->
+
+<g class="trajectory-family copper-family">
+
+  <path
+    class="trajectory-base"
+    stroke="url(#copper-gradient)"
+    d="M-120 190
+       C130 560 320 70 540 280
+       C690 425 760 510 930 285
+       C1070 100 1160 220 1320 440"
+  />
+
+  <path
+    class="trajectory-flow flow-medium"
+    stroke="#E1A462"
+    d="M-120 190
+       C130 560 320 70 540 280
+       C690 425 760 510 930 285
+       C1070 100 1160 220 1320 440"
+  />
+
+</g>
+
+
+<!-- Caramel family -->
+
+<g class="trajectory-family caramel-family">
+
+  <path
+    class="trajectory-base"
+    stroke="url(#caramel-gradient)"
+    d="M-120 390
+       C90 330 215 85 420 175
+       C610 260 580 535 805 430
+       C1010 335 1080 75 1320 160"
+  />
+
+  <path
+    class="trajectory-flow flow-slow"
+    stroke="#7F5934"
+    d="M-120 390
+       C90 330 215 85 420 175
+       C610 260 580 535 805 430
+       C1010 335 1080 75 1320 160"
+  />
+
+</g>
 
 
     <!-- Coffee family -->
