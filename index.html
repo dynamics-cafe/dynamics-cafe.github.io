@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Dynamics Cafe</title>
+  <meta
+    name="description"
+    content="Dynamics Cafe — online seminars on dynamical systems and their applications."
+  />
+
+  <style>
+    :root {
+      --cream: #f7ecd2;
+      --cream-light: #fff9eb;
+      --coffee: #6d431f;
+      --coffee-dark: #3f2816;
+      --coffee-soft: #9a7048;
+      --line: rgba(109, 67, 31, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--cream);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--coffee-dark);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.48), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(109,67,31,.07), transparent 25%),
+        var(--cream);
+
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      overflow-x: hidden;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      isolation: isolate;
+    }
+
+    /* Decorative dynamical-system-ish curves */
+    .orbit {
+      position: fixed;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.35;
+    }
+
+    .orbit.one {
+      width: 580px;
+      height: 580px;
+      left: -220px;
+      top: -180px;
+    }
+
+    .orbit.two {
+      width: 620px;
+      height: 620px;
+      right: -250px;
+      bottom: -250px;
+      transform: rotate(18deg);
+    }
+
+    .card {
+      width: min(760px, 100%);
+      border: 1px solid var(--line);
+      background: rgba(255, 249, 235, 0.80);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 42px;
+      box-shadow:
+        0 30px 90px rgba(63, 40, 22, 0.09),
+        0 2px 8px rgba(63, 40, 22, 0.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 64px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--coffee);
+      border-radius: 50%;
+      background: var(--cream-light);
+      position: relative;
+    }
+
+    .logo::before {
+      content: "";
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--coffee);
+      border-radius: 50%;
+    }
+
+    .logo::after {
+      content: "";
+      position: absolute;
+      width: 11px;
+      height: 14px;
+      right: 10px;
+      top: 24px;
+      border: 3px solid var(--coffee);
+      border-left: 0;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      line-height: 0.95;
+      color: var(--coffee);
+      letter-spacing: -0.04em;
+    }
+
+    .brand-text p {
+      margin: 8px 0 0;
+      color: var(--coffee-soft);
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+    }
+
+    .rule {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(109,67,31,.6),
+        transparent
+      );
+      margin: 0 0 36px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--coffee-soft);
+    }
+
+    .title {
+      margin: 0;
+      max-width: 650px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 3.45rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      color: var(--coffee-dark);
+    }
+
+    .speaker {
+      margin: 22px 0 4px;
+      font-size: 1.12rem;
+      font-weight: 700;
+    }
+
+    .affiliation {
+      margin: 0;
+      max-width: 600px;
+      color: #735a45;
+      line-height: 1.5;
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 30px 0;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.40);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 0.92rem;
+      font-weight: 650;
+    }
+
+    .join {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 64px;
+      padding: 16px 22px;
+      border-radius: 18px;
+      background: var(--coffee);
+      color: #fffaf0;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.06rem;
+      letter-spacing: 0.01em;
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+      box-shadow: 0 12px 28px rgba(109, 67, 31, 0.18);
+    }
+
+    .join:hover {
+      transform: translateY(-2px);
+      background: var(--coffee-dark);
+      box-shadow: 0 16px 34px rgba(109, 67, 31, 0.22);
+    }
+
+    .join:focus-visible {
+      outline: 3px solid rgba(109,67,31,.30);
+      outline-offset: 4px;
+    }
+
+    .note {
+      margin: 14px auto 0;
+      max-width: 560px;
+      text-align: center;
+      color: #765f4c;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      margin-top: 34px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: #765f4c;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--coffee);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding: 22px 14px;
+        align-items: flex-start;
+      }
+
+      .card {
+        padding: 28px 22px;
+        border-radius: 22px;
+      }
+
+      .logo {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+      }
+
+      .logo::before {
+        width: 23px;
+        height: 23px;
+      }
+
+      .logo::after {
+        width: 9px;
+        height: 12px;
+        right: 7px;
+        top: 19px;
+      }
+
+      .details {
+        display: grid;
+      }
+
+      .pill {
+        width: fit-content;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background graphics -->
+  <svg class="orbit one" viewBox="0 0 600 600" aria-hidden="true">
+    <path
+      d="M80,320
+         C140,80 470,80 520,270
+         C565,440 345,550 210,460
+         C80,372 170,220 310,238
+         C430,254 430,390 340,414
+         C230,445 175,342 230,286"
+      fill="none"
+      stroke="#6d431f"
+      stroke-width="1.5"
+    />
+    <circle cx="310" cy="238" r="4" fill="#6d431f"/>
+    <circle cx="340" cy="414" r="4" fill="#6d431f"/>
+  </svg>
+
+  <svg class="orbit two" viewBox="0 0 600 600" aria-hidden="true">
+    <path
+      d="M72,300
+         C100,120 330,30 486,155
+         C650,285 480,520 280,515
+         C125,510 60,370 145,270
+         C250,145 435,220 422,350
+         C410,470 245,470 205,376
+         C165,280 278,216 350,264"
+      fill="none"
+      stroke="#6d431f"
+      stroke-width="1.5"
+    />
+  </svg>
+
+  <main class="page">
+    <section class="card">
+
+      <header class="brand">
+        <div class="logo" aria-hidden="true"></div>
+
+        <div class="brand-text">
+          <h1>Dynamics Cafe</h1>
+          <p>Online seminars on dynamical systems and their applications</p>
+        </div>
+      </header>
+
+      <hr class="rule" />
+
+      <p class="eyebrow">Next seminar</p>
+
+      <h2 class="title">
+        Noise-induced Excitability and Pulse Dynamics in Autotoxic Populations
+      </h2>
+
+      <p class="speaker">Pablo Spilberg</p>
+
+      <p class="affiliation">
+        Department of Agricultural Sciences,<br />
+        University of Naples Federico II, Portici, Italy
+      </p>
+
+      <div class="details">
+        <div class="pill">Friday, 9 October 2026</div>
+
+        <!-- Replace this once the final time is confirmed -->
+        <div class="pill">Time: to be confirmed</div>
+
+        <div class="pill">Online</div>
+      </div>
+
+      <!--
+        CHANGE ONLY THIS URL FOR EACH SEMINAR
+      -->
+      <a
+        class="join"
+        href="https://meet.google.com/REPLACE-WITH-MEETING-LINK"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Join the seminar →
+      </a>
+
+      <p class="note">
+        The meeting link changes for each seminar.
+        This page will always point to the current meeting.
+      </p>
+
+      <footer>
+        <span>Dynamics Cafe</span>
+
+        <a
+          href="https://www.linkedin.com/company/dynamics-cafe/home/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Follow us on LinkedIn ↗
+        </a>
+      </footer>
+
+    </section>
+  </main>
+
+</body>
+</html>
