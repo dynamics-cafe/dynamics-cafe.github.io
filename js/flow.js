@@ -65,10 +65,9 @@
       { x: 0.46 * w / S, y: 0.52 * h / S, k: 0.7, s: 1.0 },
     ];
 
-    // seed density follows the screen area, so phone and desktop look alike
-    const cell = 170;
-    const nx = Math.max(3, Math.round(w / cell));
-    const ny = Math.max(3, Math.round(h / cell));
+    // same number of streamlines and comets on every screen,
+    // so the phone looks as rich as the desktop
+    const nx = 6, ny = 6;
     lines = [];
     for (let i = 0; i < nx; i++) {
       for (let j = 0; j < ny; j++) {
@@ -79,7 +78,7 @@
       }
     }
 
-    const nc = Math.min(16, Math.max(7, Math.round((w * h) / 90000)));
+    const nc = 12;
     comets = Array.from({ length: nc }, (_, i) => newComet(i));
     paintLines();
   }
