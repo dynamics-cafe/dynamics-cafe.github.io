@@ -98,7 +98,7 @@ async function loadNextSeminar() {
 
       ${joinButton}
 
-      <p class="muted">
+      <p class="meeting-note">
         The meeting link changes for each seminar.
         This page always points to the current one.
       </p>
