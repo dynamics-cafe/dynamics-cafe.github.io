@@ -3,16 +3,18 @@
    ================================================== */
 
 :root {
-  --ink: #471904;
-  --text: #592106;
-  --muted: #7F5934;
-  --line: #E1A462;
-  --soft: #EFE5D2;
+  /* Palette sampled from the logo and the seminar flyer */
+  --ink: #481808;
+  --text: #664221;
+  --muted: #8A6440;
+  --line: #E8CFA0;
+  --soft: #FBE6C0;
+  --paper: #FFF1D6;
 
-  --coffee: #592106;
-  --copper: #D57D2E;
-  --caramel: #E1A462;
-  --cream: #EFE5D2;
+  --coffee: #664221;
+  --copper: #E88838;
+  --caramel: #E8A858;
+  --cream: #FFF1D6;
 }
 
 * {
@@ -28,7 +30,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
-  background: #EFE5D2;
+  background: var(--paper);
   line-height: 1.6;
 }
 
@@ -59,7 +61,7 @@ a {
 header {
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
-  background: rgba(247, 236, 210, 0.92);
+  background: rgba(255, 241, 214, 0.92);
 }
 
 nav {
@@ -79,6 +81,15 @@ nav {
   text-decoration: none;
 }
 
+.logo small {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .nav-logo {
   width: 110px;
   height: auto;
@@ -92,7 +103,7 @@ nav .links {
 }
 
 nav .links a {
-  color: #4b5563;
+  color: var(--text);
   text-decoration: none;
 }
 
@@ -110,7 +121,7 @@ nav .links a:hover {
   overflow: hidden;
   isolation: isolate;
   padding: 110px 0 90px;
-  background: #EFE5D2;
+  background: var(--paper);
 }
 
 .hero-content {
@@ -135,7 +146,7 @@ nav .links a:hover {
 .intro {
   max-width: 650px;
   font-size: 1.15rem;
-  color: #4b5563;
+  color: var(--text);
 }
 
 
@@ -146,56 +157,11 @@ nav .links a:hover {
 .trajectory-background {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
 }
-
-.phase-portrait {
-  position: absolute;
-  width: 115%;
-  height: 115%;
-  left: -7.5%;
-  top: -7.5%;
-  overflow: visible;
-}
-
-
-/* Main fixed trajectory curves */
-
-/* Main trajectories stay completely still */
-
-.trajectory-base {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.52;
-}
-
-
-/* Only the splash groups move */
-
-.trajectory-splash {
-  pointer-events: none;
-  opacity: 0.96;
-}
-
-
-/* Thin background trajectories stay static */
-
-.secondary-trajectory {
-  fill: none;
-  stroke: #441A05;
-  stroke-width: 1.3;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.13;
-}
-
-.secondary-two {
-  opacity: 0.07;
-}
-
 
 
 /* Soft readability veil behind title */
@@ -210,10 +176,10 @@ nav .links a:hover {
   background:
     linear-gradient(
       90deg,
-      rgba(247, 236, 210, 0.92) 0%,
-      rgba(247, 236, 210, 0.72) 32%,
-      rgba(247, 236, 210, 0.22) 62%,
-      rgba(247, 236, 210, 0) 100%
+      rgba(255, 241, 214, 0.9) 0%,
+      rgba(255, 241, 214, 0.65) 32%,
+      rgba(255, 241, 214, 0.15) 62%,
+      rgba(255, 241, 214, 0) 100%
     );
 }
 
@@ -234,8 +200,8 @@ nav .links a:hover {
   padding: 13px 22px;
   border-radius: 8px;
 
-  background: #471904;
-  color: #EFE5D2;
+  background: var(--ink);
+  color: var(--paper);
 
   text-decoration: none;
   font-weight: 700;
@@ -250,7 +216,7 @@ nav .links a:hover {
 }
 
 .button:hover {
-  background: #592106;
+  background: var(--coffee);
   transform: translateY(-2px);
 
   box-shadow:
@@ -258,7 +224,7 @@ nav .links a:hover {
 }
 
 .button.secondary {
-  background: #f3f4f6;
+  background: var(--soft);
   color: var(--ink);
 }
 
@@ -293,9 +259,13 @@ section h2 {
    ================================================== */
 
 .event {
+  max-width: 640px;
   padding: 28px;
-  background: var(--soft);
+  background: rgba(251, 230, 192, 0.85);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--copper);
   border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
 .event h3 {
@@ -351,7 +321,7 @@ section h2 {
   color: var(--muted);
 }
 .meeting-note {
-  color: #471904;
+  color: var(--ink);
   margin-top: 14px;
 }
 
@@ -400,11 +370,6 @@ footer a {
     scroll-behavior: auto;
   }
 
-  .trajectory-flow,
-  .trajectory-family {
-    animation: none;
-  }
-
   .button {
     transition: none;
   }
@@ -438,27 +403,13 @@ footer a {
     padding: 80px 0 65px;
   }
 
-  .phase-portrait {
-     width: 145%;
-     left: -22.5%;
-   }
-
-  .trajectory-base {
-    opacity: 0.48;
-  }
-
-  .trajectory-flow {
-    opacity: 0.85;
-  }
-
   .hero::after {
-    background:
-      linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.72) 55%,
-        rgba(255, 255, 255, 0.15) 100%
-      );
+    background: linear-gradient(
+      90deg,
+      rgba(255, 241, 214, 0.88) 0%,
+      rgba(255, 241, 214, 0.65) 55%,
+      rgba(255, 241, 214, 0.2) 100%
+    );
   }
 
   .footer-content {
