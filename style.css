@@ -164,39 +164,41 @@ nav .links a:hover {
 
 .trajectory-base {
   fill: none;
-  stroke-width: 2.4;
+  stroke-width: 3.2;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  opacity: 0.62;
+  opacity: 0.72;
 }
-
-
-/* Moving bright fragments */
 
 .trajectory-flow {
   fill: none;
-  stroke-width: 4;
+  stroke-width: 6;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 
-  stroke-dasharray: 3 22;
+  /* larger bright splashes instead of tiny dots */
+  stroke-dasharray: 9 28;
 
-  opacity: 0.98;
+  opacity: 1;
+
+  filter:
+    drop-shadow(0 0 3px rgba(255, 151, 30, 0.45))
+    drop-shadow(0 0 8px rgba(255, 177, 65, 0.18));
 }
 
 
 /* Continuous flow speeds */
 
 .flow-fast {
-  animation: trajectory-flow 6.5s linear infinite;
+  animation: trajectory-flow 5.5s linear infinite;
 }
 
 .flow-medium {
-  animation: trajectory-flow 9s linear infinite;
+  animation: trajectory-flow 7.5s linear infinite;
 }
 
 .flow-slow {
-  animation: trajectory-flow 12s linear infinite;
+  animation: trajectory-flow 10s linear infinite;
 }
 
 .violet-family .trajectory-flow {
@@ -223,14 +225,14 @@ nav .links a:hover {
 
 .secondary-trajectory {
   fill: none;
-  stroke: #6d431f;
-  stroke-width: 1.2;
+  stroke: #542000;
+  stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
-  opacity: 0.12;
+  opacity: 0.16;
 }
 
 .secondary-two {
-  opacity: 0.07;
+  opacity: 0.09;
 }
 
 
@@ -428,6 +430,9 @@ section h2 {
 
 .muted {
   color: var(--muted);
+}
+.meeting-note {
+  color: #351000;
 }
 
 
