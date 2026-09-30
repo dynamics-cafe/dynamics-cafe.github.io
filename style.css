@@ -25,12 +25,18 @@ html {
   scroll-behavior: smooth;
 }
 
+/* The colour lives on <html>: the fixed flow canvas (z-index -1) paints
+   above it, and the transparent <body> lets it show through. */
+html {
+  background: var(--paper);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
-  background: var(--paper);
+  background: transparent;
   line-height: 1.6;
 }
 
