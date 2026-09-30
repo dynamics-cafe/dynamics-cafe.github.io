@@ -61,7 +61,8 @@ a {
 header {
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 241, 214, 0.92);
+  background: rgba(255, 241, 214, 0.8);
+  backdrop-filter: blur(6px);
 }
 
 nav {
@@ -119,9 +120,7 @@ nav .links a:hover {
 .hero {
   position: relative;
   overflow: hidden;
-  isolation: isolate;
   padding: 110px 0 90px;
-  background: var(--paper);
 }
 
 .hero-content {
@@ -155,32 +154,12 @@ nav .links a:hover {
    ================================================== */
 
 .trajectory-background {
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 0;
-}
-
-
-/* Soft readability veil behind title */
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 241, 214, 0.9) 0%,
-      rgba(255, 241, 214, 0.65) 32%,
-      rgba(255, 241, 214, 0.15) 62%,
-      rgba(255, 241, 214, 0) 100%
-    );
+  z-index: -1;
 }
 
 
@@ -401,15 +380,6 @@ footer a {
 
   .hero {
     padding: 80px 0 65px;
-  }
-
-  .hero::after {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 241, 214, 0.88) 0%,
-      rgba(255, 241, 214, 0.65) 55%,
-      rgba(255, 241, 214, 0.2) 100%
-    );
   }
 
   .footer-content {
