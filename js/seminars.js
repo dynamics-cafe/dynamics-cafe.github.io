@@ -116,6 +116,10 @@ async function loadNextSeminar() {
       timeLine = `<br>${main}${local}`;
     }
 
+    const speaker = nextSeminar.speaker_url
+      ? `<a class="speaker-link" href="${nextSeminar.speaker_url}" target="_blank" rel="noopener noreferrer">${nextSeminar.speaker}</a>`
+      : nextSeminar.speaker;
+
     const joinButton =
       nextSeminar.meeting_url &&
       !nextSeminar.meeting_url.startsWith("REPLACE")
@@ -145,7 +149,7 @@ async function loadNextSeminar() {
       </h3>
 
       <p>
-        <strong>${nextSeminar.speaker}</strong><br>
+        <strong>${speaker}</strong><br>
         ${nextSeminar.affiliation}
       </p>
 

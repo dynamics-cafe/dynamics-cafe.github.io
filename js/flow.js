@@ -65,19 +65,21 @@
       { x: 0.46 * w / S, y: 0.52 * h / S, k: 0.7, s: 1.0 },
     ];
 
-    // seeds on a jittered grid; fewer lines on small screens
-    const n = w < 700 ? 4 : 6;
+    // seed density follows the screen area, so phone and desktop look alike
+    const cell = 170;
+    const nx = Math.max(3, Math.round(w / cell));
+    const ny = Math.max(3, Math.round(h / cell));
     lines = [];
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        const px = ((i + 0.5 + 0.4 * Math.sin(i * 7 + j * 3)) / n) * w;
-        const py = ((j + 0.5 + 0.4 * Math.cos(i * 5 + j * 11)) / n) * h;
+    for (let i = 0; i < nx; i++) {
+      for (let j = 0; j < ny; j++) {
+        const px = ((i + 0.5 + 0.4 * Math.sin(i * 7 + j * 3)) / nx) * w;
+        const py = ((j + 0.5 + 0.4 * Math.cos(i * 5 + j * 11)) / ny) * h;
         const pts = trace(px, py);
         if (pts.length > 120) lines.push(pts);
       }
     }
 
-    const nc = Math.min(14, Math.max(6, Math.round(w / 110)));
+    const nc = Math.min(16, Math.max(7, Math.round((w * h) / 90000)));
     comets = Array.from({ length: nc }, (_, i) => newComet(i));
     paintLines();
   }
