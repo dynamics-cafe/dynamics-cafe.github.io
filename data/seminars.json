@@ -6,8 +6,9 @@
     "duration_minutes": 60,
     "title": "Noise-induced Excitability and Pulse Dynamics in Autotoxic Populations",
     "speaker": "Pablo Moreno-Spiegelberg",
-    "affiliation": "Department of Agricultural Sciences, University of Naples Federico II, Portici, Italy",
-    "meeting_url": "https://meet.google.com/zzr-odhh-ysd",
+    "photo": "img/speakers/pablo-moreno-spiegelberg.webp",
+    "photo_focus": "29% 31%",
+    "photo_zoom": 1.9,
     "speaker_links": [
       {
         "label": "Google Scholar",
@@ -17,6 +18,9 @@
         "label": "ResearchGate",
         "url": "https://www.researchgate.net/profile/Pablo-Moreno-Spiegelberg"
       }
-    ]
+    ],
+    "affiliation": "Department of Agricultural Sciences, University of Naples Federico II, Portici, Italy",
+    "meeting_url": "https://meet.google.com/zzr-odhh-ysd",
+    "abstract": "Species populations often modify their environment as they grow. When environmental feedback operates more slowly than population growth, the system can undergo boom–bust dynamics, where the population overshoots its carrying capacity and subsequently collapses. In extreme cases, this collapse leads to total extinction. Deterministic models, usually written in the form of ordinary differential equations, fail to capture these finite-time extinction events. We propose a stochastic framework, derived from an individual-based model, to describe boom–bust–extinction dynamics. We identify a noise-driven, threshold-like behavior where, depending on initial conditions, the population either undergoes a “boom” or goes extinct before the expansion occurs. Furthermore, we characterize a transition between an excitable regime, where most trajectories are captured by the absorbing state immediately after the first bust, and a persistent regime, where most populations reach a metastable state. This excitable system has been expanded to include spatial growth, showing spatiotemporal behaviours compatible with those shown in seagrass meadows."
   }
 ]

@@ -26,6 +26,23 @@ function zonedToDate(dateStr, timeStr, timeZone) {
   return new Date(guess);
 }
 
+// Fill a portrait frame with any image: cover the frame, zoom around the face, keep the face a
+// little above centre, and never leave empty edges.
+function fitPortrait(frame, img) {
+  if (!img.naturalWidth) return;
+  const [fx, fy] = (frame.dataset.focus || "50% 35%").split(/\s+/).map(v => parseFloat(v) / 100);
+  const zoom = Math.max(1, parseFloat(frame.dataset.zoom) || 1);
+  const bw = frame.clientWidth, bh = frame.clientHeight;
+  const s = Math.max(bw / img.naturalWidth, bh / img.naturalHeight) * zoom;
+  const w = img.naturalWidth * s, h = img.naturalHeight * s;
+  const left = Math.min(0, Math.max(bw - w, bw / 2 - fx * w));
+  const top = Math.min(0, Math.max(bh - h, bh * 0.42 - fy * h));
+  Object.assign(img.style, {
+    position: "absolute", width: w + "px", height: h + "px",
+    left: left + "px", top: top + "px", maxWidth: "none"
+  });
+}
+
 function formatTimeRange(start, minutes, timeZone) {
   const end = new Date(start.getTime() + minutes * 60000);
   const hm = {
@@ -116,12 +133,26 @@ async function loadNextSeminar() {
       timeLine = `<br>${main}${local}`;
     }
 
+    // optional portrait: any image shape works. "photo_focus" is where the face is (% of the image),
+    // "photo_zoom" zooms in around it; the frame is always filled, never left empty.
+    const photo = nextSeminar.photo
+      ? `<div class="speaker-photo" data-focus="${nextSeminar.photo_focus || "50% 35%"}" data-zoom="${nextSeminar.photo_zoom || 1}"><img src="${nextSeminar.photo}" alt="Portrait of ${nextSeminar.speaker}" loading="lazy" decoding="async"></div>`
+      : "";
+
     // profile links supplied by the speaker (Google Scholar, ResearchGate, website, ...)
     const links = (nextSeminar.speaker_links || []).filter(l => l && l.url);
     const speakerLinks = links.length
       ? `<span class="speaker-links">${links.map(l =>
           `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a>`
         ).join("")}</span>`
+      : "";
+
+    // abstract: blank lines in the JSON text become separate paragraphs
+    const abstractBlock = nextSeminar.abstract
+      ? `<section class="abstract" aria-label="Abstract">
+           <p class="abstract-label">Abstract</p>
+           ${String(nextSeminar.abstract).split(/\n\s*\n/).map(t => `<p class="abstract-text">${t.trim()}</p>`).join("")}
+         </section>`
       : "";
 
     const joinButton =
@@ -152,10 +183,13 @@ async function loadNextSeminar() {
         ${nextSeminar.title}
       </h3>
 
-      <p>
-        <strong>${nextSeminar.speaker}</strong><br>
-        ${nextSeminar.affiliation}
-      </p>
+      <div class="speaker${photo ? " has-photo" : ""}">
+        ${photo}
+        <p class="speaker-info">
+          <strong>${nextSeminar.speaker}</strong>
+          <span>${nextSeminar.affiliation}</span>
+        </p>
+      </div>
       ${speakerLinks}
 
       <p>
@@ -168,7 +202,28 @@ async function loadNextSeminar() {
         The meeting link changes for each seminar.
         This page always points to the current one.
       </p>
+
+      ${abstractBlock}
     `;
+
+    // portrait: fit to the frame once loaded (and on resize); drop the frame if the file fails to load
+    const frames = [...container.querySelectorAll(".speaker-photo")];
+    frames.forEach(frame => {
+      const img = frame.querySelector("img");
+      const place = () => fitPortrait(frame, img);
+      img.addEventListener("load", place);
+      if (img.complete && img.naturalWidth) place();
+      img.addEventListener("error", () => {
+        const speaker = frame.closest(".speaker");
+        frame.remove();
+        if (speaker) speaker.classList.remove("has-photo");
+      });
+    });
+    if (frames.length) {
+      window.addEventListener("resize", () =>
+        frames.forEach(f => f.isConnected && fitPortrait(f, f.querySelector("img")))
+      );
+    }
 
   } catch (error) {
 
