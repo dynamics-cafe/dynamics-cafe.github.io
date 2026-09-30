@@ -223,14 +223,14 @@ nav .links a:hover {
 
 .secondary-trajectory {
   fill: none;
-  stroke: #25324a;
+  stroke: #6d431f;
   stroke-width: 1.2;
   vector-effect: non-scaling-stroke;
-  opacity: 0.14;
+  opacity: 0.12;
 }
 
 .secondary-two {
-  opacity: 0.08;
+  opacity: 0.07;
 }
 
 
