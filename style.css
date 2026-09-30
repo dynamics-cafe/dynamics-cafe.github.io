@@ -164,49 +164,65 @@ nav .links a:hover {
 
 .trajectory-base {
   fill: none;
-  stroke-width: 3.2;
+  stroke-width: 3.6;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  opacity: 0.72;
+  opacity: 0.68;
 }
+
 
 .trajectory-flow {
   fill: none;
-  stroke-width: 6;
+
+  /*
+    Irregular moving streaks:
+    long splash → short splash → dot →
+    medium splash → small dot → gap.
+  */
+  stroke-width: 8;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 
-  /* larger bright splashes instead of tiny dots */
-  stroke-dasharray: 9 28;
+  stroke-dasharray:
+    34 10
+    8 8
+    3 13
+    20 11
+    5 24;
 
   opacity: 1;
 
-  filter:
-    drop-shadow(0 0 3px rgba(255, 151, 30, 0.45))
-    drop-shadow(0 0 8px rgba(255, 177, 65, 0.18));
+  /*
+    Intentionally NO drop-shadow/filter here.
+    SVG filters on continuously animated paths
+    are one of the main causes of stuttering.
+  */
 }
 
 
 /* Continuous flow speeds */
 
 .flow-fast {
-  animation: trajectory-flow 5.5s linear infinite;
+  animation: trajectory-flow 5.8s linear infinite;
 }
 
 .flow-medium {
-  animation: trajectory-flow 7.5s linear infinite;
+  animation: trajectory-flow 8.2s linear infinite;
 }
 
 .flow-slow {
-  animation: trajectory-flow 10s linear infinite;
+  animation: trajectory-flow 10.6s linear infinite;
 }
 
+
+/* Offset the families so their splashes do not line up */
+
 .copper-family .trajectory-flow {
-  animation-delay: -3.5s;
+  animation-delay: -2.7s;
 }
 
 .caramel-family .trajectory-flow {
-  animation-delay: -7s;
+  animation-delay: -5.4s;
 }
 
 
@@ -216,7 +232,12 @@ nav .links a:hover {
   }
 
   to {
-    stroke-dashoffset: -250;
+    /*
+      544 = 4 complete repetitions of the
+      136-unit dash pattern above.
+      This makes the loop seamless.
+    */
+    stroke-dashoffset: -544;
   }
 }
 
@@ -530,9 +551,9 @@ footer a {
   }
 
   .phase-portrait {
-    width: 165%;
-    left: -30%;
-  }
+     width: 145%;
+     left: -22.5%;
+   }
 
   .trajectory-base {
     opacity: 0.48;
