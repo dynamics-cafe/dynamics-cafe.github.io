@@ -244,8 +244,8 @@ section h2 {
    ================================================== */
 
 .event {
-  max-width: 720px;
-  padding: 28px;
+  max-width: none;
+  padding: 36px 40px 40px;
   background: rgba(251, 230, 192, 0.85);
   border: 1px solid var(--line);
   border-left: 4px solid var(--copper);
@@ -724,15 +724,6 @@ footer a {
   margin-bottom: 0;
 }
 
-.abstract-label + .abstract-text::first-letter {
-  float: left;
-  margin: 4px 10px 0 0;
-  font-size: 3.1rem;
-  line-height: 0.85;
-  font-weight: 700;
-  color: var(--ink);
-}
-
 @media (max-width: 650px) {
   .event {
     padding: 22px 18px;
@@ -754,5 +745,83 @@ footer a {
   .abstract-text {
     font-size: 0.98rem;
     line-height: 1.7;
+  }
+}
+
+
+/* Seminar card: same width as the panels below.
+   Speaker on the left, date and join on the right, abstract underneath in two columns. */
+
+.event-grid {
+  margin-top: 26px;
+}
+
+.event-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0 48px;
+  align-items: start;
+}
+
+.event-who,
+.event-when {
+  min-width: 0;
+}
+
+.event-when {
+  padding-left: 48px;
+  border-left: 1px solid var(--line);
+}
+
+.event-when > :first-child {
+  margin-top: 0;
+}
+
+.event-who > :last-child,
+.event-when > :last-child {
+  margin-bottom: 0;
+}
+
+.event-grid .abstract {
+  margin-top: 30px;
+}
+
+.abstract-body {
+  columns: 2;
+  column-gap: 44px;
+}
+
+.event-grid .abstract-text {
+  max-width: none;
+}
+
+.abstract-label + .abstract-body > .abstract-text:first-child::first-letter {
+  float: left;
+  margin: 4px 10px 0 0;
+  font-size: 3.1rem;
+  line-height: 0.85;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+@media (max-width: 820px) {
+  .event {
+    padding: 28px 22px 30px;
+  }
+
+  .event-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .event-when {
+    padding-left: 0;
+    padding-top: 22px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .abstract-body {
+    columns: 1;
   }
 }
