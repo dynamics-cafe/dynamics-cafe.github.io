@@ -151,7 +151,9 @@ async function loadNextSeminar() {
     const abstractBlock = nextSeminar.abstract
       ? `<section class="abstract" aria-label="Abstract">
            <p class="abstract-label">Abstract</p>
-           ${String(nextSeminar.abstract).split(/\n\s*\n/).map(t => `<p class="abstract-text">${t.trim()}</p>`).join("")}
+           <div class="abstract-body">
+             ${String(nextSeminar.abstract).split(/\n\s*\n/).map(t => `<p class="abstract-text">${t.trim()}</p>`).join("")}
+           </div>
          </section>`
       : "";
 
@@ -183,6 +185,10 @@ async function loadNextSeminar() {
         ${nextSeminar.title}
       </h3>
 
+      <div class="event-grid${abstractBlock ? " has-abstract" : ""}">
+      <div class="event-main">
+
+      <div class="event-who">
       <div class="speaker${photo ? " has-photo" : ""}">
         ${photo}
         <p class="speaker-info">
@@ -191,7 +197,9 @@ async function loadNextSeminar() {
         </p>
       </div>
       ${speakerLinks}
+      </div>
 
+      <div class="event-when">
       <p>
         <strong>${date}</strong>${timeLine}
       </p>
@@ -202,8 +210,12 @@ async function loadNextSeminar() {
         The meeting link changes for each seminar.
         This page always points to the current one.
       </p>
+      </div>
+
+      </div>
 
       ${abstractBlock}
+      </div>
     `;
 
     // portrait: fit to the frame once loaded (and on resize); drop the frame if the file fails to load
