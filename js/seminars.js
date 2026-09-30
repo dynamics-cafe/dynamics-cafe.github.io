@@ -220,4 +220,5 @@ async function loadPastSeminars() {
   }
 }
 
+loadNextSeminar();
 loadPastSeminars();
