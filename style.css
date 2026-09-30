@@ -413,3 +413,198 @@ footer a {
   font-weight: 400;
   color: var(--copper);
 }
+
+
+/* ==================================================
+   Call for speakers / contact
+   ================================================== */
+
+.talk {
+  border-top: 0;
+  padding: 20px 0 90px;
+}
+
+.talk-panel {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 48px;
+  padding: 44px;
+  background: rgba(255, 241, 214, 0.82);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 18px 40px rgba(72, 24, 8, 0.08);
+}
+
+.talk-intro,
+.talk-send {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.talk-intro h2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 18px;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.mic {
+  flex: none;
+  fill: none;
+  stroke: var(--copper);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mic rect {
+  fill: rgba(232, 136, 56, 0.16);
+}
+
+.talk-intro p {
+  margin: 0 0 14px;
+  font-size: 1.08rem;
+}
+
+.talk-intro .muted {
+  font-size: 0.98rem;
+}
+
+.talk-send {
+  padding: 28px;
+  background: rgba(251, 230, 192, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.talk-label {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.checklist {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.checklist li {
+  position: relative;
+  padding-left: 32px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--copper);
+}
+
+.checklist li::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: calc(0.28em + 3.5px);
+  width: 5px;
+  height: 9px;
+  border: solid var(--paper);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.9);
+}
+
+.checklist .optional {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.checklist .optional::before {
+  background: transparent;
+  border: 2px solid var(--caramel);
+}
+
+.checklist .optional::after {
+  display: none;
+}
+
+.checklist .optional span {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.talk-send .button {
+  display: block;
+  text-align: center;
+}
+
+.talk-email {
+  margin: 16px 0 4px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.talk-email a {
+  text-decoration-color: var(--copper);
+  text-underline-offset: 3px;
+}
+
+.talk-note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.talk-send a:focus-visible,
+.button:focus-visible {
+  outline: 3px solid var(--copper);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .talk-panel {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 28px 22px;
+  }
+
+  .talk-send {
+    padding: 22px;
+  }
+
+  .talk-email {
+    font-size: 0.9rem;
+    overflow-wrap: normal;
+  }
+}
