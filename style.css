@@ -243,16 +243,16 @@ nav .links a:hover {
   transform-origin: center;
 }
 
-.cyan-family {
-  animation: breathe-cyan 11s ease-in-out infinite;
+.coffee-family {
+  animation: breathe-coffee 11s ease-in-out infinite;
 }
 
-.violet-family {
-  animation: breathe-violet 14s ease-in-out infinite;
+.copper-family {
+  animation: breathe-copper 14s ease-in-out infinite;
 }
 
-.coral-family {
-  animation: breathe-coral 16s ease-in-out infinite;
+.caramel-family {
+  animation: breathe-caramel 16s ease-in-out infinite;
 }
 
 @keyframes breathe-cyan {
