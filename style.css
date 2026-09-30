@@ -322,20 +322,30 @@ nav .links a:hover {
 
 .button {
   display: inline-block;
-  padding: 12px 20px;
+  padding: 13px 22px;
   border-radius: 8px;
+
+  background: #542000;
+  color: #fff7e8;
+
   text-decoration: none;
-  font-weight: 600;
-  background: var(--ink);
-  color: #ffffff;
+  font-weight: 700;
+
+  box-shadow:
+    0 6px 18px rgba(84, 32, 0, 0.16);
+
   transition:
     transform 0.2s ease,
-    opacity 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .button:hover {
-  transform: translateY(-1px);
-  opacity: 0.92;
+  background: #8a3707;
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 9px 24px rgba(84, 32, 0, 0.22);
 }
 
 .button.secondary {
