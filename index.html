@@ -12,7 +12,7 @@
     content="Dynamics Cafe — online seminars on dynamical systems and their applications."
   >
 
-  <link rel="stylesheet" href="style.css?v=20261001a">
+  <link rel="stylesheet" href="style.css?v=20261001b">
 </head>
 
 <body>
@@ -85,17 +85,13 @@
             <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
             <path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4" />
           </svg>
-          Outlook, Apple &amp; others
+          Apple, Outlook &amp; others
         </a>
         <span class="muted">Every Dynamics Cafe seminar, straight into your own calendar.</span>
       </div>
 
       <details class="calendar-help">
-        <summary>Using Outlook? Add it by hand</summary>
-        <ol>
-          <li>In Outlook, choose <strong>Add calendar</strong>, then <strong>Subscribe from web</strong>.</li>
-          <li>Paste this address and give the calendar a name:</li>
-        </ol>
+        <summary>The button didn't open your calendar? Subscribe with this address</summary>
         <input
           id="ics-url"
           class="ics-url"
@@ -105,8 +101,15 @@
           aria-label="Calendar address in iCal format"
           onclick="this.select()"
         >
+        <ul>
+          <li><strong>Outlook:</strong> Add calendar, then Subscribe from web.</li>
+          <li><strong>Apple Calendar on Mac:</strong> File, then New Calendar Subscription.</li>
+          <li><strong>iPhone / iPad:</strong> Settings, Calendar, Accounts, Add Account, Other, Add Subscribed Calendar.</li>
+          <li><strong>Other apps:</strong> look for "Subscribe to calendar" or "Add from URL".</li>
+        </ul>
         <p class="muted">
-          The calendar then updates itself. New seminars can take a few hours to appear.
+          Menu names vary a little between versions. The calendar then updates itself, and new
+          seminars can take a few hours to appear.
         </p>
       </details>
 
@@ -205,8 +208,8 @@
 </footer>
 
 
-<script src="js/flow.js?v=20261001a"></script>
-<script src="js/seminars.js?v=20261001a"></script>
+<script src="js/flow.js?v=20261001b"></script>
+<script src="js/seminars.js?v=20261001b"></script>
 
 </body>
 </html>
