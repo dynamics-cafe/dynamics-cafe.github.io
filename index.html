@@ -12,7 +12,7 @@
     content="Dynamics Cafe — online seminars on dynamical systems and their applications."
   >
 
-  <link rel="stylesheet" href="style.css?v=20260930o">
+  <link rel="stylesheet" href="style.css?v=20261001a">
 </head>
 
 <body>
@@ -80,8 +80,35 @@
           </svg>
           Add to Google Calendar
         </a>
+        <a class="button secondary" href="webcal://calendar.google.com/calendar/ical/b4bf05c1f5bbd6d68da1977c8f01544dd8a0ac351d7682cf87809bc593fa659a%40group.calendar.google.com/public/basic.ics">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+            <path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4" />
+          </svg>
+          Outlook, Apple &amp; others
+        </a>
         <span class="muted">Every Dynamics Cafe seminar, straight into your own calendar.</span>
       </div>
+
+      <details class="calendar-help">
+        <summary>Using Outlook? Add it by hand</summary>
+        <ol>
+          <li>In Outlook, choose <strong>Add calendar</strong>, then <strong>Subscribe from web</strong>.</li>
+          <li>Paste this address and give the calendar a name:</li>
+        </ol>
+        <input
+          id="ics-url"
+          class="ics-url"
+          type="text"
+          readonly
+          value="https://calendar.google.com/calendar/ical/b4bf05c1f5bbd6d68da1977c8f01544dd8a0ac351d7682cf87809bc593fa659a%40group.calendar.google.com/public/basic.ics"
+          aria-label="Calendar address in iCal format"
+          onclick="this.select()"
+        >
+        <p class="muted">
+          The calendar then updates itself. New seminars can take a few hours to appear.
+        </p>
+      </details>
 
     </div>
 
@@ -178,8 +205,8 @@
 </footer>
 
 
-<script src="js/flow.js?v=20260930o"></script>
-<script src="js/seminars.js?v=20260930o"></script>
+<script src="js/flow.js?v=20261001a"></script>
+<script src="js/seminars.js?v=20261001a"></script>
 
 </body>
 </html>

@@ -872,3 +872,45 @@ footer a {
   display: flex;
   gap: 22px;
 }
+
+
+.calendar-help {
+  margin-top: 14px;
+  max-width: 640px;
+  padding: 12px 18px;
+  background: rgba(255, 241, 214, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.calendar-help summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.calendar-help ol {
+  margin: 12px 0 10px;
+  padding-left: 1.2em;
+}
+
+.calendar-help li + li {
+  margin-top: 4px;
+}
+
+.ics-url {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font: 0.82rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.calendar-help p {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+}
