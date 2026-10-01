@@ -12,7 +12,7 @@
     content="Dynamics Cafe — online seminars on dynamical systems and their applications."
   >
 
-  <link rel="stylesheet" href="style.css?v=20261001b">
+  <link rel="stylesheet" href="style.css?v=20261001c">
 </head>
 
 <body>
@@ -92,15 +92,21 @@
 
       <details class="calendar-help">
         <summary>The button didn't open your calendar? Subscribe with this address</summary>
-        <input
-          id="ics-url"
-          class="ics-url"
-          type="text"
-          readonly
-          value="https://calendar.google.com/calendar/ical/b4bf05c1f5bbd6d68da1977c8f01544dd8a0ac351d7682cf87809bc593fa659a%40group.calendar.google.com/public/basic.ics"
-          aria-label="Calendar address in iCal format"
-          onclick="this.select()"
-        >
+        <div class="ics-row">
+          <input
+            id="ics-url"
+            class="ics-url"
+            type="text"
+            readonly
+            value="https://calendar.google.com/calendar/ical/b4bf05c1f5bbd6d68da1977c8f01544dd8a0ac351d7682cf87809bc593fa659a%40group.calendar.google.com/public/basic.ics"
+            aria-label="Calendar address in iCal format"
+            onclick="this.select()"
+          >
+          <button id="ics-copy" class="copy-button" type="button" data-copy-target="ics-url">
+            Copy
+          </button>
+        </div>
+        <p id="ics-status" class="copy-status" role="status" aria-live="polite"></p>
         <ul>
           <li><strong>Outlook:</strong> Add calendar, then Subscribe from web.</li>
           <li><strong>Apple Calendar on Mac:</strong> File, then New Calendar Subscription.</li>
@@ -208,8 +214,9 @@
 </footer>
 
 
-<script src="js/flow.js?v=20261001b"></script>
-<script src="js/seminars.js?v=20261001b"></script>
+<script src="js/flow.js?v=20261001c"></script>
+<script src="js/seminars.js?v=20261001c"></script>
+<script src="js/copy.js?v=20261001c"></script>
 
 </body>
 </html>
