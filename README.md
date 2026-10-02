@@ -23,3 +23,10 @@ Edit `data/seminars.json`. The page shows the next upcoming seminar automaticall
 Put the image in `img/speakers/`. Any shape works (landscape, square, portrait): it is cropped to a portrait
 frame around `photo_focus`, and the frame never shows empty edges. Use JPG, PNG or WebP at about 800-1200 px on
 the long side. iPhone HEIC files are not supported by browsers: export them as JPG first.
+
+## About this website
+
+This website was built by the Dynamics Cafe organisers with the help of an AI coding assistant
+(Claude, by Anthropic). The organisers made the design decisions and chose the content; the code was
+written by the assistant. The organisers review and maintain it, and are responsible for what it says.
+The footer credit reads: "Human taste, Claude's code, a lot of coffee".
