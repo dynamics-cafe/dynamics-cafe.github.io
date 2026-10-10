@@ -97,6 +97,11 @@ async function loadNextSeminar() {
           Details of the next Dynamics Cafe seminar
           will appear here shortly.
         </p>
+
+        <p class="muted">
+          Seminars take place on the second Friday of every month
+          at 14:00 Europe/Rome Time.
+        </p>
       `;
 
       return;
@@ -249,10 +254,131 @@ async function loadNextSeminar() {
   }
 }
 
-async function loadPastSeminars() {
-  const container = document.getElementById("past-seminars");
+function escapeHtml(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+}
 
-  if (!container) return;
+function pastCard(seminar) {
+  const tz = seminar.timezone || "Europe/Rome";
+  const date = new Intl.DateTimeFormat("en-GB", {
+    timeZone: tz,
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  }).format(new Date(`${seminar.date}T12:00:00`));
+
+  const photo = seminar.photo
+    ? `<div class="past-photo" data-focus="${escapeHtml(seminar.photo_focus || "50% 35%")}" data-zoom="${escapeHtml(seminar.photo_zoom || 1)}"><img src="${escapeHtml(seminar.photo)}" alt="" decoding="async"></div>`
+    : "";
+
+  const keywords = Array.isArray(seminar.keywords) && seminar.keywords.length
+    ? `<p class="past-keywords">${seminar.keywords.map(k => `<span>${escapeHtml(k)}</span>`).join("")}</p>`
+    : "";
+
+  // links: whatever the speaker shared, plus the recording and slides if we have them
+  const links = [
+    ...(seminar.recording_url ? [{ label: "Watch the recording", url: seminar.recording_url }] : []),
+    ...(seminar.slides_url ? [{ label: "Slides", url: seminar.slides_url }] : []),
+    ...(seminar.speaker_links || [])
+  ].filter(l => l && l.url);
+
+  const linkRow = links.length
+    ? `<p class="past-links">${links.map(l =>
+        `<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.label)}</a>`
+      ).join("")}</p>`
+    : "";
+
+  const abstract = seminar.abstract
+    ? `<div class="past-abstract-wrap">
+         <p class="past-abstract">${escapeHtml(seminar.abstract)}</p>
+         <button class="past-more" type="button" aria-expanded="false" hidden>Read the full abstract</button>
+       </div>`
+    : "";
+
+  return `
+    <article class="past-card">
+      <p class="past-date">${escapeHtml(date)}</p>
+      <h3>${escapeHtml(seminar.title)}</h3>
+
+      <div class="past-speaker${photo ? " has-photo" : ""}">
+        ${photo}
+        <p>
+          <strong>${escapeHtml(seminar.speaker)}</strong>
+          ${seminar.affiliation ? `<span>${escapeHtml(seminar.affiliation)}</span>` : ""}
+        </p>
+      </div>
+
+      ${abstract}
+      ${keywords}
+      ${linkRow}
+    </article>
+  `;
+}
+
+function setupCarousel(section, track) {
+  const buttons = [...section.querySelectorAll(".carousel-btn")];
+  const controls = section.querySelector(".carousel-controls");
+
+  const step = () => {
+    const card = track.querySelector(".past-card");
+    return card ? card.getBoundingClientRect().width + 20 : track.clientWidth;
+  };
+
+  const update = () => {
+    const max = track.scrollWidth - track.clientWidth;
+    const scrollable = max > 4;
+    controls.hidden = !scrollable;
+    buttons[0].disabled = track.scrollLeft <= 4;
+    buttons[1].disabled = track.scrollLeft >= max - 4;
+    // soft fades on the edges that still have cards beyond them
+    track.classList.toggle("fade-left", scrollable && track.scrollLeft > 4);
+    track.classList.toggle("fade-right", scrollable && track.scrollLeft < max - 4);
+  };
+
+  buttons.forEach(btn =>
+    btn.addEventListener("click", () =>
+      track.scrollBy({ left: Number(btn.dataset.dir) * step(), behavior: "smooth" })
+    )
+  );
+
+  track.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+  window.addEventListener("resize", update);
+  track.addEventListener("keydown", event => {
+    if (event.key === "ArrowRight") { track.scrollBy({ left: step(), behavior: "smooth" }); event.preventDefault(); }
+    if (event.key === "ArrowLeft") { track.scrollBy({ left: -step(), behavior: "smooth" }); event.preventDefault(); }
+  });
+
+  update();
+}
+
+function setupAbstracts(track) {
+  track.querySelectorAll(".past-abstract-wrap").forEach(wrap => {
+    const text = wrap.querySelector(".past-abstract");
+    const button = wrap.querySelector(".past-more");
+    if (!text || !button) return;
+
+    const measure = () => {
+      if (wrap.classList.contains("is-open")) return;
+      button.hidden = text.scrollHeight <= text.clientHeight + 2;
+    };
+
+    button.addEventListener("click", () => {
+      const open = wrap.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", String(open));
+      button.textContent = open ? "Show less" : "Read the full abstract";
+      button.hidden = false;
+    });
+
+    measure();
+    window.addEventListener("resize", measure);
+  });
+}
+
+async function loadPastSeminars() {
+  const section = document.getElementById("past");
+  const track = document.getElementById("past-seminars");
+
+  if (!section || !track) return;
 
   try {
     const response = await fetch(SEMINARS_FILE, {
@@ -269,87 +395,34 @@ async function loadPastSeminars() {
     today.setHours(0, 0, 0, 0);
 
     const pastSeminars = seminars
-      .filter(seminar => {
-        const date = new Date(`${seminar.date}T00:00:00`);
-        return date < today;
-      })
-      .sort((a, b) => {
-        return new Date(b.date) - new Date(a.date);
+      .filter(seminar => new Date(`${seminar.date}T00:00:00`) < today)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // nothing to show yet: keep the whole archive section out of the page
+    if (pastSeminars.length === 0) return;
+
+    track.innerHTML = pastSeminars.map(pastCard).join("");
+    section.hidden = false;
+
+    // portraits: same fitting logic as the seminar card; drop the frame if a file fails to load
+    track.querySelectorAll(".past-photo").forEach(frame => {
+      const img = frame.querySelector("img");
+      const place = () => fitPortrait(frame, img);
+      img.addEventListener("load", place);
+      if (img.complete && img.naturalWidth) place();
+      img.addEventListener("error", () => {
+        const speaker = frame.closest(".past-speaker");
+        frame.remove();
+        if (speaker) speaker.classList.remove("has-photo");
       });
-
-    if (pastSeminars.length === 0) {
-      container.innerHTML = `
-        <p class="muted">
-          No past seminars yet — Dynamics Cafe is just getting started.
-        </p>
-      `;
-      return;
-    }
-
-    const list = document.createElement("div");
-    list.className = "seminar-list";
-
-    pastSeminars.forEach(seminar => {
-      const item = document.createElement("article");
-      item.className = "seminar-item";
-
-      const date = new Intl.DateTimeFormat(
-        "en-GB",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        }
-      ).format(
-        new Date(`${seminar.date}T00:00:00`)
-      );
-
-      let keywords = "";
-
-      if (
-        Array.isArray(seminar.keywords) &&
-        seminar.keywords.length > 0
-      ) {
-        keywords = `
-          <p class="seminar-keywords">
-            ${seminar.keywords.join(" · ")}
-          </p>
-        `;
-      }
-
-      item.innerHTML = `
-        <p class="muted">${date}</p>
-
-        <h3>${seminar.title}</h3>
-
-        <p class="seminar-speaker">
-          <strong>${seminar.speaker}</strong>
-          ${seminar.affiliation ? ` · ${seminar.affiliation}` : ""}
-        </p>
-
-        ${
-          seminar.abstract
-            ? `<p class="seminar-abstract">${seminar.abstract}</p>`
-            : ""
-        }
-
-        ${keywords}
-      `;
-
-      list.append(item);
+      window.addEventListener("resize", () => frame.isConnected && fitPortrait(frame, img));
     });
 
-    container.innerHTML = "";
-    container.append(list);
+    setupAbstracts(track);
+    setupCarousel(section, track);
 
   } catch (error) {
     console.error(error);
-
-    container.innerHTML = `
-      <p class="muted">
-        The seminar archive is temporarily unavailable.
-      </p>
-    `;
   }
 }
 
