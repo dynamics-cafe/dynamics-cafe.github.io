@@ -43,6 +43,15 @@ function fitPortrait(frame, img) {
   });
 }
 
+// "14:00–15:00" in the given zone, without any zone name
+function formatClockRange(start, minutes, timeZone) {
+  const end = new Date(start.getTime() + minutes * 60000);
+  const f = new Intl.DateTimeFormat("en-GB", {
+    timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+  });
+  return `${f.format(start)}–${f.format(end)}`;
+}
+
 function formatTimeRange(start, minutes, timeZone) {
   const end = new Date(start.getTime() + minutes * 60000);
   const hm = {
@@ -84,8 +93,8 @@ function plannedDate(today) {
 
 // "14:00–15:00 CET (Rome time)" plus, for visitors elsewhere, their own local time.
 function timeLines(start, minutes, tz, withLocal) {
-  const cityName = tz.split("/").pop().replace(/_/g, " ");
-  let out = `<br>${formatTimeRange(start, minutes, tz)} (${cityName} time)`;
+  // the series always speaks in "Europe/Rome Time", so the label never changes with summer/winter time
+  let out = `<br>${formatClockRange(start, minutes, tz)} ${tz.replace(/_/g, " ")} Time`;
 
   const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (withLocal && localTz && localTz !== tz) {
@@ -324,7 +333,23 @@ async function loadSeminars() {
       nextCard.innerHTML = `
         <p class="muted">Next seminar</p>
 
-        <h3>Brewing</h3>
+        <h3 class="brewing">
+          <span>Brewing…</span>
+          <svg class="brew-doodle" viewBox="0 0 120 120" width="112" height="112" aria-hidden="true" focusable="false">
+            <path class="line" d="M24 22 H96" />
+            <path class="line" d="M30 22 L50 56 H70 L90 22" />
+            <path class="line" d="M50 56 V63 H70 V56" />
+            <path class="line fill" d="M34 36 H86" />
+            <path class="drop d1" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
+            <path class="drop d2" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
+            <path class="drop d3" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
+            <path class="line" d="M32 90 H88 V102 Q88 114 76 114 H44 Q32 114 32 102 Z" />
+            <path class="line" d="M88 95 H93 Q102 95 102 103 Q102 111 92 111 H87" />
+            <path class="line fill" d="M38 98 H82" />
+            <path class="steam s1" d="M103 40 q7 -7 0 -14 q-7 -7 0 -14" />
+            <path class="steam s2" d="M112 46 q6 -6 0 -12" />
+          </svg>
+        </h3>
 
         ${when}
 

@@ -1020,21 +1020,32 @@ footer a {
 
 .deck-status {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   margin: 0;
-  text-align: center;
+  min-width: 0;
+}
+
+/* plain text between two hairlines, so it never looks like one of the buttons */
+.deck-status::before,
+.deck-status::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(72, 24, 8, 0.28);
 }
 
 .deck-status span {
-  display: inline-block;
-  padding: 8px 18px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 241, 214, 0.94);
+  text-align: center;
   color: var(--ink);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
-  backdrop-filter: blur(6px);
+  text-shadow:
+    0 0 6px var(--paper),
+    0 0 12px var(--paper),
+    0 0 18px var(--paper);
 }
 
 .deck-btn {
@@ -1170,4 +1181,79 @@ footer a {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--copper);
+}
+
+
+/* Brewing doodle */
+
+.brewing {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.brew-doodle {
+  flex: none;
+  overflow: visible;
+}
+
+.brew-doodle .line,
+.brew-doodle .steam {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brew-doodle .fill {
+  stroke: var(--copper);
+}
+
+.brew-doodle .steam {
+  stroke: var(--copper);
+  stroke-width: 2.2;
+  animation: steam 3.2s ease-in-out infinite;
+}
+
+.brew-doodle .s2 {
+  animation-delay: 1.1s;
+}
+
+.brew-doodle .drop {
+  fill: var(--copper);
+  stroke: none;
+  opacity: 0;
+  animation: drip 1.9s ease-in infinite;
+}
+
+.brew-doodle .d2 {
+  animation-delay: 0.63s;
+}
+
+.brew-doodle .d3 {
+  animation-delay: 1.26s;
+}
+
+@keyframes drip {
+  0% { transform: translateY(-2px); opacity: 0; }
+  15% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateY(18px); opacity: 0; }
+}
+
+@keyframes steam {
+  0%, 100% { opacity: 0.25; transform: translateY(2px); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brew-doodle .steam,
+  .brew-doodle .drop {
+    animation: none;
+  }
+
+  .brew-doodle .drop {
+    opacity: 1;
+  }
 }
