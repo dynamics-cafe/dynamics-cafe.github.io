@@ -64,6 +64,40 @@ function escapeHtml(value) {
   ));
 }
 
+// The series meets on the second Friday of every month. Used to show a planned date
+// while the next seminar is not in the data file yet.
+function secondFriday(year, month) {
+  const firstDay = new Date(Date.UTC(year, month, 1)).getUTCDay();
+  return 1 + ((5 - firstDay + 7) % 7) + 7;
+}
+
+function plannedDate(today) {
+  const pad = n => String(n).padStart(2, "0");
+  for (let step = 0; step < 3; step++) {
+    const probe = new Date(today.getFullYear(), today.getMonth() + step, 1);
+    const day = secondFriday(probe.getFullYear(), probe.getMonth());
+    const candidate = new Date(probe.getFullYear(), probe.getMonth(), day);
+    if (candidate >= today) return `${probe.getFullYear()}-${pad(probe.getMonth() + 1)}-${pad(day)}`;
+  }
+  return null;
+}
+
+// "14:00–15:00 CET (Rome time)" plus, for visitors elsewhere, their own local time.
+function timeLines(start, minutes, tz, withLocal) {
+  const cityName = tz.split("/").pop().replace(/_/g, " ");
+  let out = `<br>${formatTimeRange(start, minutes, tz)} (${cityName} time)`;
+
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (withLocal && localTz && localTz !== tz) {
+    const day = z => new Intl.DateTimeFormat("en-GB", { timeZone: z, dateStyle: "short" }).format(start);
+    const localDay = day(localTz) === day(tz) ? "" : new Intl.DateTimeFormat("en-GB", {
+      timeZone: localTz, weekday: "short", day: "numeric", month: "short"
+    }).format(start) + ", ";
+    out += `<br><span class="muted">Your local time: ${localDay}${formatTimeRange(start, minutes, localTz)}</span>`;
+  }
+  return out;
+}
+
 const DATE_LONG = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
 
 // One seminar, drawn as a card. `past` switches off the join button and local-time lines.
@@ -75,20 +109,7 @@ function seminarCard(seminar, past) {
 
   const date = new Intl.DateTimeFormat("en-GB", { timeZone: tz, ...DATE_LONG }).format(start);
 
-  let timeLine = "";
-  if (hasTime) {
-    const cityName = tz.split("/").pop().replace(/_/g, " ");
-    timeLine = `<br>${formatTimeRange(start, minutes, tz)} (${cityName} time)`;
-
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (!past && localTz && localTz !== tz) {
-      const day = z => new Intl.DateTimeFormat("en-GB", { timeZone: z, dateStyle: "short" }).format(start);
-      const localDay = day(localTz) === day(tz) ? "" : new Intl.DateTimeFormat("en-GB", {
-        timeZone: localTz, weekday: "short", day: "numeric", month: "short"
-      }).format(start) + ", ";
-      timeLine += `<br><span class="muted">Your local time: ${localDay}${formatTimeRange(start, minutes, localTz)}</span>`;
-    }
-  }
+  const timeLine = hasTime ? timeLines(start, minutes, tz, !past) : "";
 
   // optional portrait: any image shape works. "photo_focus" is where the face is (% of the image),
   // "photo_zoom" zooms in around it; the frame is always filled, never left empty.
@@ -191,7 +212,7 @@ function setupDeck(track) {
   const prev = document.getElementById("deck-prev");
   const next = document.getElementById("deck-next");
   const prevLabel = document.getElementById("deck-prev-label");
-  const status = document.getElementById("deck-status");
+  const status = document.getElementById("deck-status");   // the text span inside the status pill
   const slides = [...track.querySelectorAll(".deck-slide")];
   const last = slides.length - 1;
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -286,14 +307,29 @@ async function loadSeminars() {
     if (nextSeminar) {
       nextCard.innerHTML = seminarCard(nextSeminar, false);
     } else {
+      const planned = plannedDate(today);
+      let when = "";
+
+      if (planned) {
+        const start = zonedToDate(planned, "14:00", "Europe/Rome");
+        const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", ...DATE_LONG }).format(start);
+        when = `
+          <div class="planned">
+            <p class="planned-label">Save the date</p>
+            <p><strong>${escapeHtml(date)}</strong>${timeLines(start, 60, "Europe/Rome", true)}</p>
+          </div>
+        `;
+      }
+
       nextCard.innerHTML = `
         <p class="muted">Next seminar</p>
 
-        <h3>Coming soon</h3>
+        <h3>Brewing</h3>
+
+        ${when}
 
         <p>
-          Details of the next Dynamics Cafe seminar
-          will appear here shortly.
+          The speaker and the talk will be announced here shortly.
         </p>
 
         <p class="muted">
