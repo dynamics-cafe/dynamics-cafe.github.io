@@ -73,6 +73,13 @@ function escapeHtml(value) {
   ));
 }
 
+// "9 October 2026", for the label above the cards
+function shortDate(seminar) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: seminar.timezone || "Europe/Rome", day: "numeric", month: "long", year: "numeric"
+  }).format(new Date(`${seminar.date}T12:00:00`));
+}
+
 // The series meets on the second Friday of every month. Used to show a planned date
 // while the next seminar is not in the data file yet.
 function secondFriday(year, month) {
@@ -221,7 +228,8 @@ function setupDeck(track) {
   const prev = document.getElementById("deck-prev");
   const next = document.getElementById("deck-next");
   const prevLabel = document.getElementById("deck-prev-label");
-  const status = document.getElementById("deck-status");   // the text span inside the status pill
+  const status = document.getElementById("deck-status");   // kind ("Next seminar") over the date
+  const dots = document.getElementById("deck-dots");
   const slides = [...track.querySelectorAll(".deck-slide")];
   const last = slides.length - 1;
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -245,7 +253,10 @@ function setupDeck(track) {
 
   const update = () => {
     const i = current();
-    status.textContent = slides[i].dataset.label || "Next seminar";
+    const { kind = "Next seminar", date = "" } = slides[i].dataset;
+    status.innerHTML = `<span class="deck-kind">${escapeHtml(kind)}</span>` +
+      (date ? `<span class="deck-date">${escapeHtml(date)}</span>` : "");
+    dots.querySelectorAll("button").forEach((d, k) => d.setAttribute("aria-current", k === i ? "true" : "false"));
     prev.disabled = i <= 0;
     next.disabled = i >= last;
     prevLabel.textContent = i === last ? "Past seminars" : "Earlier";
@@ -255,6 +266,11 @@ function setupDeck(track) {
   if (slides.length > 1) {
     bar.hidden = false;
     track.closest(".seminar-deck").classList.add("has-bar");
+    dots.hidden = false;
+    dots.innerHTML = slides.map((s, k) =>
+      `<button type="button" aria-label="${escapeHtml(s.dataset.kind + (s.dataset.date ? ", " + s.dataset.date : ""))}"></button>`
+    ).join("");
+    dots.querySelectorAll("button").forEach((d, k) => d.addEventListener("click", () => goTo(k)));
     prev.addEventListener("click", () => goTo(current() - 1));
     next.addEventListener("click", () => goTo(current() + 1));
     track.addEventListener("keydown", event => {
@@ -313,6 +329,8 @@ async function loadSeminars() {
       .filter(seminar => day(seminar) < today)
       .sort((a, b) => day(a) - day(b));          // oldest first, so the latest sits next to "Next"
 
+    let nextDate = nextSeminar ? shortDate(nextSeminar) : "";
+
     if (nextSeminar) {
       nextCard.innerHTML = seminarCard(nextSeminar, false);
     } else {
@@ -322,6 +340,7 @@ async function loadSeminars() {
       if (planned) {
         const start = zonedToDate(planned, "14:00", "Europe/Rome");
         const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", ...DATE_LONG }).format(start);
+        nextDate = shortDate({ date: planned });
         when = `
           <div class="planned">
             <p class="planned-label">Save the date</p>
@@ -333,43 +352,48 @@ async function loadSeminars() {
       nextCard.innerHTML = `
         <p class="muted">Next seminar</p>
 
-        <h3 class="brewing">
-          <span>Brewing…</span>
-          <svg class="brew-doodle" viewBox="0 0 120 120" width="112" height="112" aria-hidden="true" focusable="false">
-            <path class="line" d="M24 22 H96" />
-            <path class="line" d="M30 22 L50 56 H70 L90 22" />
-            <path class="line" d="M50 56 V63 H70 V56" />
-            <path class="line fill" d="M34 36 H86" />
-            <path class="drop d1" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
-            <path class="drop d2" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
-            <path class="drop d3" d="M60 68 q-3.4 5 0 7.6 q3.4 -2.6 0 -7.6 z" />
-            <path class="line" d="M32 90 H88 V102 Q88 114 76 114 H44 Q32 114 32 102 Z" />
-            <path class="line" d="M88 95 H93 Q102 95 102 103 Q102 111 92 111 H87" />
-            <path class="line fill" d="M38 98 H82" />
-            <path class="steam s1" d="M103 40 q7 -7 0 -14 q-7 -7 0 -14" />
-            <path class="steam s2" d="M112 46 q6 -6 0 -12" />
-          </svg>
-        </h3>
+        <div class="brew">
+          <div class="brew-art" aria-hidden="true">
+            <svg class="brew-doodle" viewBox="0 0 120 120" width="128" height="128" focusable="false">
+              <defs>
+                <clipPath id="brew-cup"><path d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" /></clipPath>
+              </defs>
+              <rect class="line" x="18" y="10" width="84" height="104" rx="9" />
+              <path class="line" d="M18 42 H102" />
+              <circle class="line" cx="38" cy="26" r="8" />
+              <path class="line needle" d="M38 26 L42 21" />
+              <circle class="knob" cx="80" cy="26" r="2.6" />
+              <circle class="knob" cx="90" cy="26" r="2.6" />
+              <path class="line" d="M52 42 V47 H68 V42" />
+              <path class="line" d="M47 47 H73 L70 55 H50 Z" />
+              <path class="line" d="M73 50 H93" />
+              <path class="line" d="M57 55 V58 M63 55 V58" />
+              <path class="stream" d="M57 60 V89 M63 60 V89" />
+              <g clip-path="url(#brew-cup)"><rect class="coffee" x="47" y="89" width="26" height="18" /></g>
+              <path class="line" d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" />
+              <path class="line" d="M73 93 Q80 93 80 98 Q80 102 72 102" />
+              <path class="line" d="M30 108.5 H90" />
+            </svg>
+          </div>
 
-        ${when}
+          <div class="brew-text">
+            <h3 class="brewing">Brewing<span class="brew-dots"><i>.</i><i>.</i><i>.</i></span></h3>
+            <p class="brew-lead">The next talk is on its way. Speaker and title will be announced here shortly.</p>
+            ${when}
+          </div>
+        </div>
 
-        <p>
-          The speaker and the talk will be announced here shortly.
-        </p>
-
-        <p class="muted">
+        <p class="muted brew-note">
           Seminars take place on the second Friday of every month
           at 14:00 Europe/Rome Time.
         </p>
       `;
     }
-    nextCard.dataset.label = "Next seminar";
+    nextCard.dataset.kind = "Next seminar";
+    nextCard.dataset.date = nextDate;
 
     nextCard.insertAdjacentHTML("beforebegin", pastSeminars.map(seminar => {
-      const label = new Intl.DateTimeFormat("en-GB", {
-        timeZone: seminar.timezone || "Europe/Rome", day: "numeric", month: "long", year: "numeric"
-      }).format(new Date(`${seminar.date}T12:00:00`));
-      return `<article class="event deck-slide past-slide" data-label="Past seminar · ${escapeHtml(label)}">${seminarCard(seminar, true)}</article>`;
+      return `<article class="event deck-slide past-slide" data-kind="Past seminar" data-date="${escapeHtml(shortDate(seminar))}">${seminarCard(seminar, true)}</article>`;
     }).join(""));
 
     hydratePortraits(track);
