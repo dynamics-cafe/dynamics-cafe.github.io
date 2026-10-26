@@ -10,7 +10,8 @@ Edit `data/seminars.json`. The page opens on the next upcoming seminar automatic
 | --- | --- |
 | `date`, `time`, `timezone` | e.g. `2026-11-13`, `14:00`, `Europe/Rome`. Daylight saving and each visitor's local time are handled for you. |
 | `duration_minutes` | Length of the slot (default 60). |
-| `title`, `speaker`, `affiliation` | Shown on the seminar card. |
+| `title`, `speaker` | Shown on the seminar card. |
+| `affiliation` | A list of lines, written as on the LinkedIn cards: the unit (if any), the institution with its acronym in brackets, then "City, Country". Example: `["MathLab", "International School for Advanced Studies (SISSA)", "Trieste, Italy"]`. |
 | `speaker_links` | Optional list of `{ "label": "Google Scholar", "url": "..." }`, one chip per link. |
 | `abstract` | Optional. A blank line starts a new paragraph. |
 | `meeting_url` | The Google Meet link (only shown on the website). |
