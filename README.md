@@ -4,7 +4,7 @@ Landing page for the Dynamics Cafe online seminar series.
 
 ## Adding the next seminar
 
-Edit `data/seminars.json`. The page shows the next upcoming seminar automatically.
+Edit `data/seminars.json`. The page opens on the next upcoming seminar automatically. Past seminars are on its left; later announced seminars are on its right, followed by a "Brewing…" card with the next free date (second Friday of the month).
 
 | Field | Meaning |
 | --- | --- |

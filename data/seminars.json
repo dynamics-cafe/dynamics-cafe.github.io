@@ -27,5 +27,45 @@
     ],
     "meeting_url": "https://meet.google.com/zzr-odhh-ysd",
     "abstract": "Species populations often modify their environment as they grow. When environmental feedback operates more slowly than population growth, the system can undergo boom–bust dynamics, where the population overshoots its carrying capacity and subsequently collapses. In extreme cases, this collapse leads to total extinction. Deterministic models, usually written in the form of ordinary differential equations, fail to capture these finite-time extinction events. We propose a stochastic framework, derived from an individual-based model, to describe boom–bust–extinction dynamics. We identify a noise-driven, threshold-like behavior where, depending on initial conditions, the population either undergoes a “boom” or goes extinct before the expansion occurs. Furthermore, we characterize a transition between an excitable regime, where most trajectories are captured by the absorbing state immediately after the first bust, and a persistent regime, where most populations reach a metastable state. This excitable system has been expanded to include spatial growth, showing spatiotemporal behaviours compatible with those shown in seagrass meadows."
+  },
+  {
+    "date": "2026-11-13",
+    "time": "14:00",
+    "timezone": "Europe/Rome",
+    "duration_minutes": 60,
+    "title": "Dynamical approximation for Wasserstein gradient flows",
+    "speaker": "Isabella Carla Gonnella",
+    "photo": "img/speakers/isabella-carla-gonnella.webp",
+    "photo_focus": "50% 26%",
+    "photo_zoom": 1.5,
+    "speaker_links": [
+      {
+        "label": "Google Scholar",
+        "url": "https://scholar.google.com/citations?user=Lejdc3QAAAAJ"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/isabella-carla-gonnella-225a92213"
+      }
+    ],
+    "affiliation": "MathLab, SISSA, Trieste, Italy",
+    "keywords": [
+      "Wasserstein gradient flows",
+      "Model order reduction",
+      "Geometric integration"
+    ],
+    "meeting_url": "https://meet.google.com/ggc-qofn-bcw",
+    "abstract": "How can we describe the evolution of an entire family of probability distributions using only a few variables, while preserving the structure of their dynamics? This question motivates our work on Wasserstein gradient flows (WGFs), which describe the steepest descent of an energy functional over probability measures, with distances measured by the Wasserstein distance. Under suitable regularity assumptions on the energy and initial condition, these dynamics admit a description through partial differential equations (PDEs), and provide a mathematical framework for diffusion and aggregation in physics and biology, while connecting naturally to optimization theory. Despite their versatility as modelling tools, computing their solutions becomes increasingly challenging as the spatial dimension grows: mesh-based methods suffer from the curse of dimensionality, while variational schemes involving optimal transport problems can also become computationally demanding.\n\nBuilding on recent work, this talk will present an alternative numerical approach that approximates the original PDE by a system of coupled ODEs on a low-dimensional manifold, following the dynamical approximation principle underlying Dirac–Frenkel and neural Galerkin methods. To this end, we project the original infinite-dimensional dynamics onto the tangent spaces of a reduced manifold constructed from local linearizations of the governing operator at selected times. This construction yields a mesh-free approximation, whose reduced coordinates are computed on the manifold through geometric numerical integration methods. Moreover, it also provides the basis for a parametric reduced-order modelling framework, enabling repeated simulations across different physical parameters and initial conditions at low additional computational cost.\n\nThrough examples of nonlinear diffusion, Fokker–Planck equations, and nonlocal aggregation dynamics, we will illustrate the approach and discuss how approximation errors can be assessed and how energy dissipation guides the reduced dynamics."
+  },
+  {
+    "date": "2026-12-11",
+    "time": "14:00",
+    "timezone": "Europe/Rome",
+    "duration_minutes": 60,
+    "title": "From Gradient Descent to Damped Mechanics: A Dynamical-Systems View of Optimization",
+    "speaker": "Viktor Stein",
+    "affiliation": "Technical University of Munich and Munich Center for Machine Learning",
+    "meeting_url": "https://meet.google.com/ciq-hssn-xnk",
+    "abstract": "Many algorithms used to train machine-learning models can be understood as discretizations of simple dynamical systems. A basic example is gradient descent: in continuous time, it becomes a gradient flow, where a point moves downhill along an energy landscape. Adding momentum leads instead to a second-order equation that resembles a damped mechanical system, with inertia, friction, and potential energy.\n\nIn this talk, I will use these elementary examples to illustrate how a dynamical-systems viewpoint can help us understand optimization algorithms. We will see how energy dissipation explains convergence and why introducing inertia can make the dynamics very different from ordinary gradient descent. I will emphasize intuition and simple examples rather than technical results.\n\nThen, I will briefly discuss how the same ideas extend beyond the motion of a single point. In many problems, the evolving state can instead be an interacting system of particles or even an entire probability distribution. This leads naturally to gradient flows and inertial dynamics on spaces of probability measures. I will end with a short example from recent work showing how this viewpoint can be used to interpret and design dynamics appearing in neural-network architectures.\n\nNo prior knowledge of optimization, optimal transport, or machine learning will be assumed."
   }
 ]
