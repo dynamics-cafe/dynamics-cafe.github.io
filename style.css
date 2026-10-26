@@ -1362,6 +1362,47 @@ footer a {
   fill: #EDD3A8;
 }
 
+/* poured liquid: a ribbon that falls in an arc, with a faint highlight running down it */
+.brew-doodle .liquid {
+  fill: #6b2f12;
+  opacity: 0.85;
+}
+
+.brew-doodle .water-liquid {
+  fill: rgba(102, 66, 33, 0.45);
+}
+
+.brew-doodle .shine {
+  fill: none;
+  stroke: rgba(255, 241, 214, 0.75);
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  stroke-dasharray: 2 6;
+  animation: pour-flow 0.5s linear infinite;
+}
+
+.brew-doodle .foam-fill {
+  fill: #D9A066;
+}
+
+.brew-doodle .grounds {
+  fill: #3b1a0a;
+}
+
+.brew-doodle .bubble {
+  fill: none;
+  stroke: #D9A066;
+  stroke-width: 1;
+}
+
+.brew-doodle .hole {
+  fill: var(--ink);
+}
+
+.brew-doodle .plate {
+  fill: var(--paper);
+}
+
 .brew-doodle .foam {
   fill: #D9A066;
   stroke: var(--ink);
@@ -1405,6 +1446,7 @@ footer a {
 
 @media (prefers-reduced-motion: reduce) {
   .brew-doodle .stream,
+  .brew-doodle .shine,
   .brew-doodle .water,
   .brew-dots i {
     animation: none;
