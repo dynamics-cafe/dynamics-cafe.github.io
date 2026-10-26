@@ -36,8 +36,8 @@
     "title": "Dynamical approximation for Wasserstein gradient flows",
     "speaker": "Isabella Carla Gonnella",
     "photo": "img/speakers/isabella-carla-gonnella.webp",
-    "photo_focus": "50% 26%",
-    "photo_zoom": 1.5,
+    "photo_focus": "35% 21%",
+    "photo_zoom": 1.25,
     "speaker_links": [
       {
         "label": "Google Scholar",
@@ -64,7 +64,34 @@
     "duration_minutes": 60,
     "title": "From Gradient Descent to Damped Mechanics: A Dynamical-Systems View of Optimization",
     "speaker": "Viktor Stein",
+    "photo": "img/speakers/viktor-stein.webp",
+    "photo_focus": "50% 33%",
+    "photo_zoom": 1.35,
+    "speaker_links": [
+      {
+        "label": "Website",
+        "url": "https://viktorajstein.github.io/"
+      },
+      {
+        "label": "Google Scholar",
+        "url": "https://scholar.google.com/citations?user=sYqBqqQAAAAJ&hl=en"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/viktor-stein/"
+      },
+      {
+        "label": "ResearchGate",
+        "url": "https://www.researchgate.net/profile/Viktor-Stein-2"
+      }
+    ],
     "affiliation": "Technical University of Munich and Munich Center for Machine Learning",
+    "keywords": [
+      "Optimization",
+      "Damped Hamiltonian flows",
+      "Gradient flows",
+      "Machine learning"
+    ],
     "meeting_url": "https://meet.google.com/ciq-hssn-xnk",
     "abstract": "Many algorithms used to train machine-learning models can be understood as discretizations of simple dynamical systems. A basic example is gradient descent: in continuous time, it becomes a gradient flow, where a point moves downhill along an energy landscape. Adding momentum leads instead to a second-order equation that resembles a damped mechanical system, with inertia, friction, and potential energy.\n\nIn this talk, I will use these elementary examples to illustrate how a dynamical-systems viewpoint can help us understand optimization algorithms. We will see how energy dissipation explains convergence and why introducing inertia can make the dynamics very different from ordinary gradient descent. I will emphasize intuition and simple examples rather than technical results.\n\nThen, I will briefly discuss how the same ideas extend beyond the motion of a single point. In many problems, the evolving state can instead be an interacting system of particles or even an entire probability distribution. This leads naturally to gradient flows and inertial dynamics on spaces of probability measures. I will end with a short example from recent work showing how this viewpoint can be used to interpret and design dynamics appearing in neural-network architectures.\n\nNo prior knowledge of optimization, optimal transport, or machine learning will be assumed."
   }
