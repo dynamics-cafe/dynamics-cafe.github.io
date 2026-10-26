@@ -222,16 +222,18 @@ function hydratePortraits(root) {
   });
 }
 
-// One swipeable strip: past seminars on the left, the next seminar last (and shown first).
-function setupDeck(track) {
+// One swipeable strip: past seminars, the next seminar (shown first), upcoming ones, then "Brewing".
+function setupDeck(track, home) {
   const bar = document.getElementById("deck-bar");
   const prev = document.getElementById("deck-prev");
   const next = document.getElementById("deck-next");
   const prevLabel = document.getElementById("deck-prev-label");
+  const nextLabel = document.getElementById("deck-next-label");
   const status = document.getElementById("deck-status");   // kind ("Next seminar") over the date
   const dots = document.getElementById("deck-dots");
   const slides = [...track.querySelectorAll(".deck-slide")];
   const last = slides.length - 1;
+  const start = Math.max(0, slides.indexOf(home));
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const current = () => {
@@ -259,7 +261,8 @@ function setupDeck(track) {
     dots.querySelectorAll("button").forEach((d, k) => d.setAttribute("aria-current", k === i ? "true" : "false"));
     prev.disabled = i <= 0;
     next.disabled = i >= last;
-    prevLabel.textContent = i === last ? "Past seminars" : "Earlier";
+    prevLabel.textContent = i === start ? "Past seminars" : "Earlier";
+    nextLabel.textContent = i === start ? "Upcoming" : "Later";
     fitHeight();
   };
 
@@ -289,14 +292,74 @@ function setupDeck(track) {
     slides.forEach(s => watcher.observe(s));
   }
 
-  // start on the next seminar, with the past ones waiting on its left
-  goTo(last, false);
+  // start on the next seminar: past ones wait on its left, upcoming ones on its right
+  goTo(start, false);
   update();
   requestAnimationFrame(() => {
-    goTo(last, false);
+    goTo(start, false);
     update();
     track.classList.add("ready");
   });
+}
+
+// The "Brewing..." card: the next free slot (second Friday at 14:00 Rome) after `after`,
+// shown after the last seminar we have announced.
+function brewingCard(after, isNext) {
+  const planned = plannedDate(after);
+  let when = "", label = "";
+
+  if (planned) {
+    const start = zonedToDate(planned, "14:00", "Europe/Rome");
+    const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", ...DATE_LONG }).format(start);
+    label = shortDate({ date: planned });
+    when = `
+      <div class="planned">
+        <p class="planned-label">Save the date</p>
+        <p><strong>${escapeHtml(date)}</strong>${timeLines(start, 60, "Europe/Rome", true)}</p>
+      </div>
+    `;
+  }
+
+  const html = `
+    <p class="muted">${isNext ? "Next seminar" : "Upcoming seminar"}</p>
+
+    <div class="brew">
+      <div class="brew-art" aria-hidden="true">
+        <svg class="brew-doodle" viewBox="0 0 120 120" width="128" height="128" focusable="false">
+          <defs>
+            <clipPath id="brew-cup"><path d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" /></clipPath>
+          </defs>
+          <rect class="line" x="18" y="10" width="84" height="104" rx="9" />
+          <path class="line" d="M18 42 H102" />
+          <circle class="line" cx="38" cy="26" r="8" />
+          <path class="line needle" d="M38 26 L42 21" />
+          <circle class="knob" cx="80" cy="26" r="2.6" />
+          <circle class="knob" cx="90" cy="26" r="2.6" />
+          <path class="line" d="M52 42 V47 H68 V42" />
+          <path class="line" d="M47 47 H73 L70 55 H50 Z" />
+          <path class="line" d="M73 50 H93" />
+          <path class="line" d="M57 55 V58 M63 55 V58" />
+          <path class="stream" d="M57 60 V89 M63 60 V89" />
+          <g clip-path="url(#brew-cup)"><rect class="coffee" x="47" y="89" width="26" height="18" /></g>
+          <path class="line" d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" />
+          <path class="line" d="M73 93 Q80 93 80 98 Q80 102 72 102" />
+          <path class="line" d="M30 108.5 H90" />
+        </svg>
+      </div>
+
+      <div class="brew-text">
+        <h3 class="brewing">Brewing<span class="brew-dots"><i>.</i><i>.</i><i>.</i></span></h3>
+        <p class="brew-lead">${isNext ? "The next talk" : "The talk after that"} is on its way. Speaker and title will be announced here shortly.</p>
+        ${when}
+      </div>
+    </div>
+
+    <p class="muted brew-note">
+      Seminars take place on the second Friday of every month
+      at 14:00 Europe/Rome Time.
+    </p>
+  `;
+  return { html, label };
 }
 
 async function loadSeminars() {
@@ -321,86 +384,45 @@ async function loadSeminars() {
 
     const day = seminar => new Date(`${seminar.date}T00:00:00`);
 
-    const nextSeminar = seminars
+    const upcoming = seminars
       .filter(seminar => day(seminar) >= today)
-      .sort((a, b) => day(a) - day(b))[0];
+      .sort((a, b) => day(a) - day(b));
+    const [nextSeminar, ...laterSeminars] = upcoming;
 
     const pastSeminars = seminars
       .filter(seminar => day(seminar) < today)
       .sort((a, b) => day(a) - day(b));          // oldest first, so the latest sits next to "Next"
 
-    let nextDate = nextSeminar ? shortDate(nextSeminar) : "";
+    // the free slot after the last announced seminar (or after today, if none is announced)
+    const lastAnnounced = upcoming.length ? day(upcoming[upcoming.length - 1]) : null;
+    const after = lastAnnounced
+      ? new Date(lastAnnounced.getFullYear(), lastAnnounced.getMonth(), lastAnnounced.getDate() + 1)
+      : today;
+    const brewing = brewingCard(after, !nextSeminar);
 
+    const slide = (seminar, kind, past) =>
+      `<article class="event deck-slide${past ? " past-slide" : ""}" data-kind="${kind}" data-date="${escapeHtml(shortDate(seminar))}">${seminarCard(seminar, past)}</article>`;
+
+    nextCard.dataset.kind = "Next seminar";
     if (nextSeminar) {
       nextCard.innerHTML = seminarCard(nextSeminar, false);
+      nextCard.dataset.date = shortDate(nextSeminar);
+      nextCard.insertAdjacentHTML("afterend",
+        laterSeminars.map(seminar => slide(seminar, "Upcoming seminar", false)).join("") +
+        `<div class="event deck-slide" data-kind="Upcoming seminar" data-date="${escapeHtml(brewing.label)}">${brewing.html}</div>`
+      );
     } else {
-      const planned = plannedDate(today);
-      let when = "";
-
-      if (planned) {
-        const start = zonedToDate(planned, "14:00", "Europe/Rome");
-        const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", ...DATE_LONG }).format(start);
-        nextDate = shortDate({ date: planned });
-        when = `
-          <div class="planned">
-            <p class="planned-label">Save the date</p>
-            <p><strong>${escapeHtml(date)}</strong>${timeLines(start, 60, "Europe/Rome", true)}</p>
-          </div>
-        `;
-      }
-
-      nextCard.innerHTML = `
-        <p class="muted">Next seminar</p>
-
-        <div class="brew">
-          <div class="brew-art" aria-hidden="true">
-            <svg class="brew-doodle" viewBox="0 0 120 120" width="128" height="128" focusable="false">
-              <defs>
-                <clipPath id="brew-cup"><path d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" /></clipPath>
-              </defs>
-              <rect class="line" x="18" y="10" width="84" height="104" rx="9" />
-              <path class="line" d="M18 42 H102" />
-              <circle class="line" cx="38" cy="26" r="8" />
-              <path class="line needle" d="M38 26 L42 21" />
-              <circle class="knob" cx="80" cy="26" r="2.6" />
-              <circle class="knob" cx="90" cy="26" r="2.6" />
-              <path class="line" d="M52 42 V47 H68 V42" />
-              <path class="line" d="M47 47 H73 L70 55 H50 Z" />
-              <path class="line" d="M73 50 H93" />
-              <path class="line" d="M57 55 V58 M63 55 V58" />
-              <path class="stream" d="M57 60 V89 M63 60 V89" />
-              <g clip-path="url(#brew-cup)"><rect class="coffee" x="47" y="89" width="26" height="18" /></g>
-              <path class="line" d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" />
-              <path class="line" d="M73 93 Q80 93 80 98 Q80 102 72 102" />
-              <path class="line" d="M30 108.5 H90" />
-            </svg>
-          </div>
-
-          <div class="brew-text">
-            <h3 class="brewing">Brewing<span class="brew-dots"><i>.</i><i>.</i><i>.</i></span></h3>
-            <p class="brew-lead">The next talk is on its way. Speaker and title will be announced here shortly.</p>
-            ${when}
-          </div>
-        </div>
-
-        <p class="muted brew-note">
-          Seminars take place on the second Friday of every month
-          at 14:00 Europe/Rome Time.
-        </p>
-      `;
+      nextCard.innerHTML = brewing.html;
+      nextCard.dataset.date = brewing.label;
     }
-    nextCard.dataset.kind = "Next seminar";
-    nextCard.dataset.date = nextDate;
 
-    nextCard.insertAdjacentHTML("beforebegin", pastSeminars.map(seminar => {
-      return `<article class="event deck-slide past-slide" data-kind="Past seminar" data-date="${escapeHtml(shortDate(seminar))}">${seminarCard(seminar, true)}</article>`;
-    }).join(""));
+    nextCard.insertAdjacentHTML("beforebegin", pastSeminars.map(seminar => slide(seminar, "Past seminar", true)).join(""));
 
     hydratePortraits(track);
     window.addEventListener("resize", () =>
       track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f.querySelector("img")))
     );
-    setupDeck(track);
+    setupDeck(track, nextCard);
 
   } catch (error) {
 
