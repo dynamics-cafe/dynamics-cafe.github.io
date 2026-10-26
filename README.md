@@ -4,7 +4,7 @@ Landing page for the Dynamics Cafe online seminar series.
 
 ## Adding the next seminar
 
-Edit `data/seminars.json`. The page opens on the next upcoming seminar automatically. Past seminars are on its left; later announced seminars are on its right, followed by a "Brewing…" card with the next free date (second Friday of the month).
+Edit `data/seminars.json`. The page opens on the next upcoming seminar automatically. Past seminars are on its left; later announced seminars are on its right, followed by a "Brewing…" card with the next free date (second Friday of the month). Its doodle cycles through brewing methods from around the world, drawn in `js/brew.js`. Its doodle cycles through brewing methods from around the world; they are drawn in .
 
 | Field | Meaning |
 | --- | --- |
