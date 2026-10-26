@@ -116,6 +116,13 @@ function timeLines(start, minutes, tz, withLocal) {
 
 const DATE_LONG = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
 
+// Affiliation as on the LinkedIn cards: one line each for the unit, the institution (with its
+// acronym) and "City, Country". A list in the JSON gives one line per entry; plain text still works.
+function affiliationLines(affiliation) {
+  const lines = Array.isArray(affiliation) ? affiliation : [affiliation];
+  return lines.filter(Boolean).map(escapeHtml).join("<br>");
+}
+
 // One seminar, drawn as a card. `past` switches off the join button and local-time lines.
 function seminarCard(seminar, past) {
   const tz = seminar.timezone || "Europe/Rome";
@@ -187,7 +194,7 @@ function seminarCard(seminar, past) {
             ${photo}
             <p class="speaker-info">
               <strong>${escapeHtml(seminar.speaker)}</strong>
-              <span>${escapeHtml(seminar.affiliation)}</span>
+              <span>${affiliationLines(seminar.affiliation)}</span>
             </p>
           </div>
           ${speakerLinks}

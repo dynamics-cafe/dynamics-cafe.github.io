@@ -19,7 +19,11 @@
         "url": "https://www.researchgate.net/profile/Pablo-Moreno-Spiegelberg"
       }
     ],
-    "affiliation": "Department of Agricultural Sciences, University of Naples Federico II, Portici, Italy",
+    "affiliation": [
+      "Department of Agricultural Sciences",
+      "University of Naples Federico II",
+      "Portici, Italy"
+    ],
     "keywords": [
       "Stochasticity",
       "Boom–bust dynamics",
@@ -48,7 +52,11 @@
         "url": "https://www.linkedin.com/in/isabella-carla-gonnella-225a92213"
       }
     ],
-    "affiliation": "MathLab, SISSA, Trieste, Italy",
+    "affiliation": [
+      "MathLab",
+      "International School for Advanced Studies (SISSA)",
+      "Trieste, Italy"
+    ],
     "keywords": [
       "Wasserstein gradient flows",
       "Model order reduction",
@@ -85,7 +93,11 @@
         "url": "https://www.researchgate.net/profile/Viktor-Stein-2"
       }
     ],
-    "affiliation": "Technical University of Munich and Munich Center for Machine Learning",
+    "affiliation": [
+      "Technical University of Munich (TUM)",
+      "Munich Center for Machine Learning (MCML)",
+      "Munich, Germany"
+    ],
     "keywords": [
       "Optimization",
       "Damped Hamiltonian flows",
