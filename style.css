@@ -1258,16 +1258,29 @@ footer a {
   border: 1px solid var(--line);
 }
 
-/* names the brewing method on show, e.g. "Moka · Italy" */
+/* names the brewing method on show: method on one line, place on the next. Fixed size, so a
+   long name never reflows the card when it changes. */
 .brew-caption {
+  display: grid;
+  gap: 2px;
+  width: 176px;
+  height: 2.6em;
   margin: 0;
-  min-height: 1.2em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.brew-name {
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #A8541A;
-  text-align: center;
+}
+
+.brew-place {
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 
 .brewing {

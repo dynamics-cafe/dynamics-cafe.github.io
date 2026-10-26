@@ -3,6 +3,10 @@
   Each scene brews until its cup is full, then slides out to the left inside the
   circle while the next one slides in from the right, forever.
   Drawn as SVG line art in a 120 x 120 box; the circle shows -28..148 of it.
+
+  Pots and cups keep track of how much coffee they hold (the area of liquid in the
+  drawing), so a pot loses exactly what lands in the cup, its level is always where
+  that amount would sit in the tilted pot, and it tips just far enough to pour.
 */
 (() => {
   const NS = "http://www.w3.org/2000/svg";
@@ -37,10 +41,66 @@
     return make("g", { "clip-path": `url(#${id})` }, g);
   };
 
-  // A cup that fills from yBottom up to yTop. `under`: a layer below the coffee (milk);
-  // `foam`: a thin foam band riding on the surface.
+  // ---- a little geometry ----
+
+  // outline -> polygon (absolute M, L, H, V, Q and Z, which is all these drawings use)
+  function polygon(d) {
+    const tok = d.match(/[MLHVQZ]|-?\d*\.?\d+/g);
+    const pts = [];
+    let i = 0, x = 0, y = 0, cmd = "M";
+    const num = () => parseFloat(tok[i++]);
+    while (i < tok.length) {
+      if (/[A-Z]/.test(tok[i])) cmd = tok[i++];
+      if (cmd === "M" || cmd === "L") { x = num(); y = num(); pts.push([x, y]); }
+      else if (cmd === "H") { x = num(); pts.push([x, y]); }
+      else if (cmd === "V") { y = num(); pts.push([x, y]); }
+      else if (cmd === "Q") {
+        const cx = num(), cy = num(), ex = num(), ey = num();
+        for (let k = 1; k <= 8; k++) {
+          const u = k / 8;
+          pts.push([(1 - u) * (1 - u) * x + 2 * (1 - u) * u * cx + u * u * ex,
+                    (1 - u) * (1 - u) * y + 2 * (1 - u) * u * cy + u * u * ey]);
+        }
+        x = ex; y = ey;
+      } else break;   // Z
+    }
+    return pts;
+  }
+  const toPath = pts => "M" + pts.map(p => p.map(f1).join(" ")).join(" L") + " Z";
+
+  // area of the polygon below the horizontal line y = level (y grows downwards)
+  function areaBelow(pts, level) {
+    const out = [];
+    for (let k = 0; k < pts.length; k++) {
+      const p = pts[k], q = pts[(k + 1) % pts.length];
+      const pin = p[1] >= level, qin = q[1] >= level;
+      if (pin) out.push(p);
+      if (pin !== qin) { const u = (level - p[1]) / (q[1] - p[1]); out.push([p[0] + u * (q[0] - p[0]), level]); }
+    }
+    let A = 0;
+    for (let k = 0; k < out.length; k++) { const p = out[k], q = out[(k + 1) % out.length]; A += p[0] * q[1] - q[0] * p[1]; }
+    return Math.abs(A) / 2;
+  }
+
+  // the level at which the polygon holds `amount`
+  function levelFor(pts, amount) {
+    let lo = Infinity, hi = -Infinity;
+    pts.forEach(p => { lo = Math.min(lo, p[1]); hi = Math.max(hi, p[1]); });
+    if (amount <= 0) return hi + 1;
+    for (let k = 0; k < 22; k++) {
+      const mid = (lo + hi) / 2;
+      if (areaBelow(pts, mid) > amount) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // ---- vessels ----
+
+  // A cup (or glass, or carafe) that fills from yBottom up to yTop. `under`: a layer below the
+  // coffee (condensed milk); `foam`: a thin foam band riding on the surface.
   function vessel(g, outline, yTop, yBottom, opts = {}) {
     const inner = clipGroup(g, opts.clip || outline);
+    const pts = polygon(opts.clip || outline);
     let base = yBottom;
     if (opts.under) {
       make("rect", { class: "milk", x: -20, width: 160, y: opts.under, height: yBottom - opts.under + 2 }, inner);
@@ -48,42 +108,89 @@
     }
     const coffee = make("rect", { class: "coffee", x: -20, width: 160, y: base, height: 0 }, inner);
     const foam = opts.foam ? make("rect", { class: "foam-fill", x: -20, width: 160, y: base, height: 0 }, inner) : null;
-    P(outline, "line", g);
+    if (!opts.noOutline) P(outline, "line", g);
+    const amountAt = y => Math.max(0, areaBelow(pts, y) - areaBelow(pts, base));
+    const setY = y => {
+      coffee.setAttribute("y", f1(y));
+      coffee.setAttribute("height", f1(Math.max(0, base - y + (opts.under ? 0 : 2))));
+      if (foam) {
+        foam.setAttribute("y", f1(y));
+        foam.setAttribute("height", f1(Math.max(0, Math.min(opts.foam, base - y))));
+      }
+      return y;
+    };
     return {
-      level(f) {
-        const y = base - f * (base - yTop);
-        coffee.setAttribute("y", y);
-        coffee.setAttribute("height", Math.max(0, base - y + (opts.under ? 0 : 2)));
-        if (foam) {
-          const h = Math.min(opts.foam, base - y);
-          foam.setAttribute("y", y);
-          foam.setAttribute("height", Math.max(0, h));
+      full: amountAt(yTop),
+      amountAt,
+      level: f => setY(base - f * (base - yTop)),
+      fillTo(amount) {
+        let lo = yTop - 6, hi = base;
+        for (let k = 0; k < 22; k++) { const mid = (lo + hi) / 2; if (amountAt(mid) > amount) lo = mid; else hi = mid; }
+        return setY(amount <= 0 ? base : (lo + hi) / 2);
+      }
+    };
+  }
+
+  // A pot with coffee inside that turns about (px, py) and slides by (tx, ty)·e.
+  // `lip`: the point the coffee must reach to pour; `spout`: where the stream leaves.
+  function pot(group, interior, { px, py, tx = 0, ty = 0, lip, spout, foam = 0 }) {
+    const pts = polygon(interior);
+    const inner = clipGroup(group, toPath(pts));
+    const levelG = make("g", {}, inner);       // turned back, so the surface stays level
+    const coffee = make("rect", { class: "coffee", x: -80, width: 280, y: 300, height: 300 }, levelG);
+    const foamR = foam ? make("rect", { class: "foam-fill", x: -80, width: 280, y: 300, height: foam }, levelG) : null;
+    const surfaceAt = (amount, a) => levelFor(pts.map(p => rot(p[0], p[1], px, py, a)), amount);
+    const lipY = a => rot(lip[0], lip[1], px, py, a)[1];
+    // the smallest tilt (towards negative angles) that brings `amount` up to the lip
+    const tiltFor = (amount, max = -120) => {
+      let lo = 0, hi = max;
+      if (surfaceAt(amount, 0) <= lipY(0)) return 0;
+      for (let k = 0; k < 18; k++) {
+        const mid = (lo + hi) / 2;
+        if (surfaceAt(amount, mid) > lipY(mid)) lo = mid; else hi = mid;
+      }
+      return hi;
+    };
+    return {
+      capacity: areaBelow(pts, -1e3),
+      tiltFor,
+      set(a, amount, e, foamH = foam) {
+        group.setAttribute("transform", `translate(${f1(tx * e)} ${f1(ty * e)}) rotate(${f1(a)} ${px} ${py})`);
+        levelG.setAttribute("transform", `rotate(${f1(-a)} ${px} ${py})`);
+        const y = surfaceAt(amount, a);
+        coffee.setAttribute("y", f1(y));
+        if (foamR) {
+          foamR.setAttribute("y", f1(y - foamH));
+          foamR.setAttribute("height", f1(Math.max(0, foamH)));
+          foamR.style.opacity = amount > 1 ? 1 : 0;
         }
-        return y;
+        const [sx, sy] = rot(spout[0], spout[1], px, py, a);
+        return [sx + tx * e, sy + ty * e];
       }
     };
   }
 
-  // Coffee inside a pot that tilts. The pot's shape turns with the pot, but the liquid is
-  // counter-rotated so its surface always stays level, like real liquid.
-  function tank(pot, clip, { px, py, foam = 0 }) {
-    const inner = clipGroup(pot, clip);
-    const level = make("g", {}, inner);
-    const coffee = make("rect", { class: "coffee", x: -60, width: 240, y: 200, height: 200 }, level);
-    const top = foam ? make("rect", { class: "foam-fill", x: -60, width: 240, y: 200, height: foam }, level) : null;
-    return (surface, angle, foamH = foam) => {
-      level.setAttribute("transform", `rotate(${-angle} ${px} ${py})`);
-      coffee.setAttribute("y", f1(surface));
-      if (top) {
-        top.setAttribute("y", f1(surface));
-        top.setAttribute("height", Math.max(0, foamH));
-      }
+  // Lift (l0..l1) and tilt until the coffee reaches the lip; pour until p1, tipping further
+  // as the pot empties; set it down by b1. The pot loses exactly what the cup gains.
+  function pourRun(p, cup, start, { l0, l1, p1, b1 }) {
+    const a0 = p.tiltFor(start);
+    const a1 = p.tiltFor(start - cup.full);
+    return (t, foamH) => {
+      const e = ease(ramp(t, l0, l1)) * (1 - ease(ramp(t, p1, b1)));
+      const y = cup.level(ease(ramp(t, l1, p1)));
+      const left = start - cup.amountAt(y);
+      let a;
+      if (t < l1) a = a0 * ease(ramp(t, l0, l1));
+      else if (t < p1) a = p.tiltFor(left);
+      else a = a1 * (1 - ease(ramp(t, p1, b1)));
+      const tip = p.set(a, left, e, foamH);
+      return { tip, cupY: y, pouring: t >= l1 && t < p1 };
     };
   }
 
-  // A falling stream of liquid: it leaves the spout and curves down under gravity
-  // (sideways distance grows like the square root of the drop), drawn as a ribbon that
-  // thins as it falls, with a faint highlight running down it.
+  // A falling stream: it leaves the spout and curves down under gravity (sideways distance
+  // grows like the square root of the drop), drawn as a ribbon that thins as it falls,
+  // with a faint highlight running down it.
   function stream(g, cls = "liquid") {
     const body = P("", cls, g);
     const shine = P("", "shine", g);
@@ -111,31 +218,12 @@
     };
   }
 
-  // A pot that lifts, tilts towards the cup and pours. While pouring it tips further
-  // (angle0 -> angle1) as it empties; the liquid surface sits at the spout lip.
-  function pouring(pot, { px, py, tx, ty, tip, angle0, angle1, rest, empty }) {
-    const tipAt = a => rot(tip[0], tip[1], px, py, a);
-    // phase: lift 0..1, pour 0..1, back 0..1
-    return (lift, pour, back) => {
-      const e = lift * (1 - back);
-      const a = lift > 0 ? (angle0 + (angle1 - angle0) * pour) * e : 0;
-      pot.setAttribute("transform", `translate(${f1(tx * e)} ${f1(ty * e)}) rotate(${f1(a)} ${px} ${py})`);
-      const lip = tipAt(a)[1] + 1.2;
-      let surface;
-      if (back > 0) surface = lerp(lerp(rest, lip, lift), empty, back);
-      else if (pour > 0) surface = lip;
-      else surface = lerp(rest, lip, lift);
-      const [x, y] = tipAt(a);
-      return { angle: a, surface, tip: [x + tx * e, y + ty * e] };
-    };
-  }
-
   // Three drops falling from (x, y0) to the surface y1.
   function drops(g, x) {
     const ds = [0, 1, 2].map(() => P("M0 -3.4 q-2.6 3.8 0 5.8 q2.6 -2 0 -5.8 z", "drop", g));
     return (t, on, y0, y1) => ds.forEach((d, k) => {
       const ph = (t * 1.6 + k / 3) % 1;
-      d.setAttribute("transform", `translate(${x} ${y0 + ph * (y1 - y0)})`);
+      d.setAttribute("transform", `translate(${x} ${f1(y0 + ph * (y1 - y0))})`);
       d.style.opacity = on && y1 - y0 > 3 ? Math.min(1, ph * 6, (1 - ph) * 6) : 0;
     });
   }
@@ -145,10 +233,22 @@
     const fs = xs.map(x => P(`M${x} ${y} q-3 -4 0 -7.5 q3 3.5 0 7.5 z`, "flame", g));
     return (t, on) => fs.forEach((f, k) => {
       const s = 0.8 + 0.22 * Math.sin(t * 13 + k * 2.1);
-      f.setAttribute("transform", `translate(${xs[k]} ${y}) scale(1 ${s}) translate(${-xs[k]} ${-y})`);
+      f.setAttribute("transform", `translate(${xs[k]} ${y}) scale(1 ${f1(s)}) translate(${-xs[k]} ${-y})`);
       f.style.opacity = on;
     });
   }
+
+  // jebena inside: spout, neck and round body as one outline
+  const JEBENA = (() => {
+    const pts = [[63, 69.5], [74.5, 78], [78, 76.2], [81, 50], [87, 50], [90, 76.2]];
+    const a0 = Math.atan2(76.2 - 89, 90 - 84), a1 = Math.atan2(83 - 89, 71.5 - 84) + 2 * Math.PI;
+    for (let k = 1; k < 24; k++) {
+      const a = a0 + (a1 - a0) * k / 24;
+      pts.push([84 + 15 * Math.cos(a), 89 + 15 * Math.sin(a)]);
+    }
+    pts.push([71.5, 83], [60, 73]);
+    return toPath(pts);
+  })();
 
   const SCENES = [
     {
@@ -173,23 +273,24 @@
           show(streams, on);
           cup.level(ease(ramp(t, 0.9, 5.7)));
           const a = -70 + 70 * ease(ramp(t, 0, 0.7)) - 70 * ease(ramp(t, 5.8, 6.5)) + (on ? Math.sin(t * 9) * 3 : 0);
-          needle.setAttribute("transform", `rotate(${a} 38 26)`);
+          needle.setAttribute("transform", `rotate(${f1(a)} 38 26)`);
         };
       }
     },
     {
-      // V60 dripper on a cup, gooseneck kettle pouring a thin stream of water onto the coffee bed
+      // V60 dripper on a cup; a gooseneck kettle pours a thin stream of water onto the bed,
+      // and the coffee runs out of the cone into the cup
       name: "Pour-over", place: "Japan", duration: 8,
       build(g) {
         P("M22 108.5 H98", "line", g);
-        const cup = vessel(g, "M44 80 H76 V97 Q76 106 67 106 H53 Q44 106 44 97 Z", 83, 106);
+        const cup = vessel(g, "M44 80 H76 V97 Q76 106 67 106 H53 Q44 106 44 97 Z", 84, 106);
         P("M76 85 Q84 85 84 92 Q84 99 76 98.5", "line", g);
         const drip = stream(g);
         P("M41 78 H79", "line thick", g);
         P("M56.5 72.5 V78 M63.5 72.5 V78", "line", g);
         const bed = vessel(g, "M44 50 H76 L64 72.5 H56 Z", 54, 72.5);
         P("M51 55 L57.6 68.5 M60 55 V69 M69 55 L62.4 68.5", "line thin", g);
-        const bloom = [[53, 0], [60, 1], [67, 2]].map(([x, k]) => make("circle", { class: "bubble", cx: x, cy: 60, r: 1.3 }, g));
+        const bloom = [53, 60, 67].map(x => make("circle", { class: "bubble", cx: x, cy: 60, r: 1.3 }, g));
         const water = stream(g, "water-liquid");
         const kettle = make("g", {}, g);
         P("M86 40 H104 L109 62 H81 Z", "line", kettle);
@@ -198,60 +299,63 @@
         P("M104 44 Q115 45 113 54 Q112 60 107.5 61", "line", kettle);
         P("M82.5 57 Q73 57 71 47 Q69.5 38 64 37 Q60.5 37 60.5 41", "line", kettle);
         return t => {
-          const e = ease(ramp(t, 0, 0.8)) - ease(ramp(t, 6.4, 7.1));
-          kettle.setAttribute("transform", `rotate(${f1(14 - 14 * e)} 95 60)`);
-          const pourOn = t > 0.8 && t < 6.4;
-          const [tx, ty] = rot(60.5, 41, 95, 60, 14 - 14 * e);
-          const surfaceBed = bed.level(0.35 + 0.35 * ease(ramp(t, 0.9, 2.2)));
+          // upright at rest; tipped forward (towards the spout) to pour
+          const e = ease(ramp(t, 0, 0.8)) - ease(ramp(t, 6.0, 6.7));
+          const angle = -10 * e, dx = 1 * e, dy = -6 * e;
+          kettle.setAttribute("transform", `translate(${f1(dx)} ${f1(dy)}) rotate(${f1(angle)} 95 50)`);
+          const pourOn = t > 0.8 && t < 6.0;
+          const [kx, ky] = rot(60.5, 41, 95, 50, angle);
+          const tx = kx + dx, ty = ky + dy;
+          // the bed wets and rises while water is poured, then drains as the coffee runs out
+          const wet = ease(ramp(t, 0.9, 2.0)) - 0.9 * ease(ramp(t, 6.0, 7.4));
+          const surfaceBed = bed.level(0.05 + 0.6 * wet);
           water(tx, ty + 0.5, 59.5, surfaceBed, 1.4, 1.1, pourOn);
           bloom.forEach((b, k) => {
             b.setAttribute("cy", f1(surfaceBed + 1.6));
             b.style.opacity = pourOn ? 0.5 + 0.5 * Math.sin(t * 5 + k * 2) : 0;
           });
-          const y = cup.level(ease(ramp(t, 1.6, 6.8)));
-          drip(60, 78.5, 60, y, 1.3, 1.1, t > 1.5 && t < 6.8);
+          const y = cup.level(ease(ramp(t, 1.6, 7.4)));
+          drip(60, 78.5, 60, y, 1.3, 1.1, t > 1.5 && t < 7.3);
         };
       }
     },
     {
-      // cezve on the flame: the coffee foams up to the rim, then it is poured, foam and all
+      // cezve on the flame: the coffee foams up towards the rim, then it is poured, foam and all
       name: "Turkish coffee", place: "Türkiye", duration: 8.5,
       build(g) {
-        const fire = flames(g, [72, 80, 88], 108);
-        P("M60 108.5 H100", "line", g);
-        const cup = vessel(g, "M21 90 H39 L37 101 Q36 104 33 104 H27 Q24 104 23 101 Z", 92, 104, { foam: 2.4 });
-        P("M38.6 93 Q44 93 43 97 Q42 100 37.5 100", "line", g);
-        P("M15 106.5 Q30 109.5 45 106.5", "line", g);
-        const pourStream = stream(g);
-        const pot = make("g", {}, g);
-        const inside = "M68 62 L72 68 Q64 84 67 100 H91 Q94 84 86 68 L90 62 Z";
-        const fill = tank(pot, inside, { px: 79, py: 82, foam: 3 });
-        P("M68 62 L72 68 Q64 84 67 100 H91 Q94 84 86 68 L90 62", "line", pot);
-        P("M88 71 L112 61", "line thick", pot);
-        const move = pouring(pot, { px: 79, py: 82, tx: -21, ty: 1, tip: [68, 62], angle0: -38, angle1: -78, rest: 64, empty: 96 });
+        const fire = flames(g, [72, 79, 86], 108);
+        P("M60 108.5 H98", "line", g);
+        const cup = vessel(g, "M17 88 H41 L38.5 101 Q37.5 105 33 105 H25 Q20.5 105 19.5 101 Z", 90.5, 105, { foam: 2.4 });
+        P("M40.4 91.5 Q46 91.5 45.2 96 Q44.5 100 39 99.5", "line", g);
+        P("M12 107.5 Q29 110.5 46 107.5", "line", g);
+        const pour = stream(g);
+        const body = make("g", {}, g);
+        const cezve = "M71 73 L74 77 Q69 88 71 100 H87 Q89 88 84 77 L87 73 Z";
+        const p = pot(body, cezve, { px: 79, py: 88, tx: -22, ty: -13, lip: [71, 73], spout: [70.5, 72.5], foam: 3 });
+        P("M71 73 L74 77 Q69 88 71 100 H87 Q89 88 84 77 L87 73", "line", body);
+        P("M85 80 L107 71", "line thick", body);
+        const start = cup.full * 1.3;
+        const run = pourRun(p, cup, start, { l0: 3.1, l1: 3.9, p1: 7.0, b1: 7.8 });
         return t => {
           fire(t, 1 - ramp(t, 3.0, 3.3));
-          const lift = ease(ramp(t, 3.0, 3.8)), pour = ease(ramp(t, 3.8, 7.0)), back = ease(ramp(t, 7.0, 7.8));
-          const m = move(lift, pour, back);
           const rise = ease(ramp(t, 0.3, 3.0));
-          const restSurface = 74 - 10 * rise;                       // foams up to the rim
-          fill(lift > 0 ? m.surface : restSurface, m.angle, 2 + 2.5 * rise);
-          const y = cup.level(pour);
-          pourStream(m.tip[0], m.tip[1], 30, y, 2.6, 1.8, t > 3.8 && t < 7.0);
+          const foam = 1.5 + 4 * rise * (1 - ease(ramp(t, 3.9, 7.0)) * 0.6);
+          const m = run(t, foam);
+          pour(m.tip[0], m.tip[1], 29.5, m.cupY, 2.6, 1.8, m.pouring);
         };
       }
     },
     {
-      // glass beaker in a metal frame: plunge the grounds down, then pour
+      // glass beaker in a metal frame: plunge the grounds down, then pour one cup
       name: "French press", place: "France", duration: 8.5,
       build(g) {
         P("M8 108.5 H104", "line", g);
         const cup = vessel(g, "M14 92 H40 V98 Q40 106 32 106 H22 Q14 106 14 98 Z", 95, 106);
         P("M14 95 Q8 95 8 99 Q8 103 15 102.5", "line", g);
-        const pourStream = stream(g);
+        const pour = stream(g);
         const press = make("g", {}, g);
         const inside = "M67 54 V100 Q67 102 69 102 H87 Q89 102 89 100 V54 Z";
-        const fill = tank(press, inside, { px: 78, py: 78 });
+        const p = pot(press, inside, { px: 78, py: 80, tx: -11, ty: -6, lip: [67, 54.5], spout: [60.5, 51] });
         const grounds = make("rect", { class: "grounds", x: 67, width: 22, y: 60, height: 5 }, clipGroup(press, inside));
         P("M67 54 V100 Q67 102 69 102 H87 Q89 102 89 100 V54", "line", press);
         P("M65 100 H91 M66 104 V101 M90 104 V101 M65 104.5 H91", "line", press);   // frame and feet
@@ -263,41 +367,42 @@
         P("M78 14 V60", "line", plunger);
         P("M68 60 H88", "line thick", plunger);
         make("circle", { class: "line", cx: 78, cy: 11, r: 3 }, plunger);
-        const move = pouring(press, { px: 78, py: 78, tx: -12, ty: 3, tip: [60.5, 51], angle0: -32, angle1: -70, rest: 59, empty: 92 });
+        const start = 22 * 42;            // filled to about y = 60, just under the lid
+        const run = pourRun(p, cup, start, { l0: 3.1, l1: 3.9, p1: 7.0, b1: 7.8 });
         return t => {
-          const press01 = ease(ramp(t, 0.5, 3.0));
-          const disc = 60 + 37 * press01;
-          plunger.setAttribute("transform", `translate(0 ${f1(37 * press01)})`);
-          grounds.setAttribute("y", f1(disc + 0.5));
-          grounds.setAttribute("height", f1(5 - 0.5 * press01));
-          const lift = ease(ramp(t, 3.0, 3.8)), pour = ease(ramp(t, 3.8, 7.0)), back = ease(ramp(t, 7.0, 7.8));
-          const m = move(lift, pour, back);
-          fill(m.surface, m.angle);
-          const y = cup.level(pour);
-          pourStream(m.tip[0], m.tip[1], 27, y, 2.6, 1.8, t > 3.8 && t < 7.0);
+          const down = ease(ramp(t, 0.5, 3.0));
+          plunger.setAttribute("transform", `translate(0 ${f1(37 * down)})`);
+          grounds.setAttribute("y", f1(61 + 36.5 * down));
+          grounds.setAttribute("height", f1(5 - 0.8 * down));
+          const m = run(t);
+          pour(m.tip[0], m.tip[1], 27, m.cupY, 2.6, 1.8, m.pouring);
         };
       }
     },
     {
-      // phin: a small metal filter with a perforated plate, resting on a glass of condensed milk
+      // phin: a small metal filter with a perforated plate, resting on a glass of condensed milk;
+      // the glass gets exactly the coffee that drips out of the filter
       name: "Phin", place: "Vietnam", duration: 8,
       build(g) {
         P("M30 108.5 H90", "line", g);
-        const glass = vessel(g, "M46 74 L48.5 104 Q48.5 106 50.5 106 H69.5 Q71.5 106 71.5 104 L74 74", 77, 106,
-          { clip: "M46 74 L48.5 104 Q48.5 106 50.5 106 H69.5 Q71.5 106 71.5 104 L74 74 Z", under: 97 });
-        P("M46 74 A14 2 0 0 0 74 74", "line thin", g);                              // front of the glass rim
+        const glass = vessel(g, "M45 84 L47.5 104 Q47.5 106 49.5 106 H70.5 Q72.5 106 72.5 104 L75 84", 85, 106,
+          { clip: "M45 84 L47.5 104 Q47.5 106 49.5 106 H70.5 Q72.5 106 72.5 104 L75 84 Z", under: 98 });
+        P("M45 84 A15 2 0 0 0 75 84", "line thin", g);                              // front of the glass rim
         const drip = drops(g, 60);
-        const chamber = vessel(g, "M51 70 V48 M69 70 V48", 50, 70, { clip: "M51 70 V48 H69 V70 Z" });
-        P("M38 70 A22 3.4 0 0 0 82 70 A22 3.4 0 0 0 38 70 Z", "line plate", g);   // perforated plate
-        [44, 50, 56, 64, 70, 76].forEach(x => make("circle", { class: "hole", cx: x, cy: 70.4, r: 0.8 }, g));
-        P("M51 48 A9 1.8 0 0 0 69 48 A9 1.8 0 0 0 51 48", "line", g);              // chamber rim
-        P("M49.5 46 Q60 36 70.5 46 Z", "line", g);                                   // domed lid
-        P("M58 39.5 V36.5 H62 V39.5", "line", g);                                    // lid knob
+        const chamber = vessel(g, "M51 82 V60 M69 82 V60", 62, 82, { clip: "M51 82 V60 H69 V82 Z" });
+        P("M38 82 A22 3.4 0 0 0 82 82 A22 3.4 0 0 0 38 82 Z", "line plate", g);   // perforated plate
+        [44, 50, 56, 64, 70, 76].forEach(x => make("circle", { class: "hole", cx: x, cy: 82.4, r: 0.8 }, g));
+        P("M51 60 A9 1.8 0 0 0 69 60 A9 1.8 0 0 0 51 60", "line", g);              // chamber rim
+        P("M49.5 58 Q60 48 70.5 58 Z", "line", g);                                   // domed lid
+        P("M58 51.5 V48.5 H62 V51.5", "line", g);                                    // lid knob
+        const top = 63, bottom = 80.5;
+        const full = chamber.amountAt(top);
         return t => {
           const f = ease(ramp(t, 0.5, 7.0));
-          chamber.level(0.92 - 0.8 * f);
-          const y = glass.level(f);
-          drip(t, t > 0.3 && t < 7.0, 74.5, y);
+          const y = lerp(top, bottom, f);
+          chamber.level((82 - y) / 20);
+          const gy = glass.fillTo(full - chamber.amountAt(y));
+          drip(t, t > 0.3 && t < 7.0, 86, gy);
         };
       }
     },
@@ -321,59 +426,56 @@
       }
     },
     {
-      // jebena: the clay pot is full of coffee, lifted and poured into small handleless cups
+      // jebena: the clay pot holds a few cups; it is lifted and pours one small cup
       name: "Jebena", place: "Ethiopia", duration: 8.5,
       build(g) {
-        const cup = vessel(g, "M20 92 H40 L38 102 Q37 105 34 105 H26 Q23 105 22 102 Z", 94, 105);
-        P("M68 108.5 Q84 104 100 108.5", "line", g);
+        const cup = vessel(g, "M19 90 H41 L39 102 Q38 105 35 105 H25 Q22 105 21 102 Z", 92, 105);
+        P("M70 108.5 Q84 104.5 98 108.5", "line", g);
         P("M12 108.5 H48", "line", g);
-        const pourStream = stream(g);
-        const pot = make("g", {}, g);
-        const fill = tank(pot, [
-          "M69 89 A15 15 0 1 0 99 89 A15 15 0 1 0 69 89 Z",
-          "M78 77 L81 50 H87 L90 77 Z",
-          "M72.5 82.5 L60.5 71.5 L63.5 69.5 L76 78 Z"
-        ], { px: 84, py: 89 });
-        make("circle", { class: "line", cx: 84, cy: 89, r: 15 }, pot);
-        P("M78 76 L81 50 M90 76 L87 50 M79 50 H89", "line", pot);
-        P("M89 55 Q100 58 97 81", "line", pot);
-        P("M71.5 83 L60 73 M74.5 78 L63 69.5 M60 73 L63 69.5", "line", pot);
-        const move = pouring(pot, { px: 84, py: 89, tx: -19, ty: -6, tip: [61.5, 71], angle0: -26, angle1: -66, rest: 62, empty: 98 });
+        const pour = stream(g);
+        const body = make("g", {}, g);
+        const p = pot(body, JEBENA, { px: 84, py: 89, tx: -20, ty: -10, lip: [61.5, 71.3], spout: [61, 71.5] });
+        make("circle", { class: "line", cx: 84, cy: 89, r: 15 }, body);
+        P("M78 76 L81 50 M90 76 L87 50 M79 50 H89", "line", body);
+        P("M89 55 Q100 58 97 81", "line", body);
+        P("M71.5 83 L60 73 M74.5 78 L63 69.5 M60 73 L63 69.5", "line", body);
+        const start = cup.full * 2.4;
+        const run = pourRun(p, cup, start, { l0: 1.0, l1: 2.0, p1: 6.6, b1: 7.5 });
         return t => {
-          const lift = ease(ramp(t, 1.0, 2.0)), pour = ease(ramp(t, 2.0, 6.8)), back = ease(ramp(t, 6.8, 7.7));
-          const m = move(lift, pour, back);
-          fill(m.surface, m.angle);
-          const y = cup.level(pour);
-          pourStream(m.tip[0], m.tip[1], 30, y, 2.6, 1.8, t > 2.0 && t < 6.8);
+          const m = run(t);
+          pour(m.tip[0], m.tip[1], 30, m.cupY, 2.6, 1.8, m.pouring);
         };
       }
     },
     {
+      // the mug gets exactly the coffee the plunger pushes out of the chamber
       name: "AeroPress", place: "USA", duration: 7,
       build(g) {
-        const mug = vessel(g, "M38 80 H78 V100 Q78 106 72 106 H44 Q38 106 38 100 Z", 84, 106);
-        P("M78 85 Q88 85 88 93 Q88 101 78 100.5", "line", g);
+        const mug = vessel(g, "M44 80 H76 V100 Q76 106 70 106 H50 Q44 106 44 100 Z", 84, 106);
+        P("M76 85 Q85 85 85 93 Q85 101 76 100.5", "line", g);
         const jet = P("M60 80 V106", "stream", g);
-        const chamber = vessel(g, "M50 79 V36 M70 79 V36", 40, 78, { clip: "M50 79 V36 H70 V79 Z" });
-        P("M42 79 H74", "line thick", g);
+        const chamber = vessel(g, "M50 79 V36 M70 79 V36", 41, 78, { clip: "M50 79 V36 H70 V79 Z" });
+        P("M43 79 H77", "line thick", g);
         P("M66 50 H69 M66 58 H69 M66 66 H69", "line thin", g);
         const plunger = make("g", {}, g);
         P("M52.5 40 V12 H67.5 V40", "line", plunger);
         P("M49 12 H71", "line thick", plunger);
         P("M52 40 H68", "line thick", plunger);
         P("M24 108.5 H96", "line", g);
+        const full = chamber.amountAt(41);
         return t => {
           const p = ease(ramp(t, 0.8, 5.6));
-          plunger.setAttribute("transform", `translate(0 ${34 * p})`);
-          chamber.level(0.95 * (1 - p) + 0.02);
-          const y = mug.level(p);
-          jet.setAttribute("d", `M60 80 V${y.toFixed(1)}`);
+          plunger.setAttribute("transform", `translate(0 ${f1(34 * p)})`);
+          const top = 41 + 34 * p;                  // the coffee sits right under the plunger seal
+          chamber.level((78 - top) / 37);
+          const y = mug.fillTo(full - chamber.amountAt(top));
+          jet.setAttribute("d", `M60 80 V${f1(y)}`);
           show(jet, t > 0.9 && t < 5.6);
         };
       }
     },
     {
-      // moka: heat until the coffee gurgles up into the top chamber, then lift and pour
+      // moka: heat until the coffee gurgles up into the top chamber, then lift and pour a cup
       name: "Moka", place: "Italy", duration: 8.5,
       build(g) {
         const fire = flames(g, [70, 78, 86], 108);
@@ -381,27 +483,32 @@
         const cup = vessel(g, "M18 92 H40 V98 Q40 106 33 106 H25 Q18 106 18 98 Z", 94, 106);
         P("M18 95 Q12 95 12 99 Q12 103 19 102.5", "line", g);
         P("M10 108.5 H46", "line", g);
-        const pourStream = stream(g);
-        const pot = make("g", {}, g);
-        const fill = tank(pot, ["M70 78 L67 56 H89 L86 78 Z", "M67.5 57 L60 52.5 L66.5 60 Z"], { px: 78, py: 78 });
-        P("M67 100 H89 L86 78 H70 Z", "line", pot);
-        P("M70 78 L67 56 H89 L86 78", "line", pot);
-        P("M67 56 L59 52 L66.5 61", "line", pot);
-        P("M89 60 Q100 60 99 68 L97 76 H87", "line", pot);
-        const lid = make("g", {}, pot);
+        const pour = stream(g);
+        const body = make("g", {}, g);
+        const p = pot(body, "M70 78 L66.5 61 L59.5 52.5 L67 56 H89 L86 78 Z",
+          { px: 78, py: 78, tx: -10, ty: -6, lip: [59.8, 52.8], spout: [59.5, 52.5] });
+        P("M67 100 H89 L86 78 H70 Z", "line", body);
+        P("M70 78 L67 56 H89 L86 78", "line", body);
+        P("M67 56 L59 52 L66.5 61", "line", body);
+        P("M89 60 Q100 60 99 68 L97 76 H87", "line", body);
+        const lid = make("g", {}, body);
         P("M66 56 H90 L86 50 H70 Z", "line", lid);
         make("circle", { class: "knob", cx: 78, cy: 47.5, r: 2.2 }, lid);
-        const move = pouring(pot, { px: 78, py: 78, tx: -9, ty: 1, tip: [59.5, 52.5], angle0: -30, angle1: -70, rest: 60, empty: 76 });
+        const start = cup.full * 1.2;
+        const run = pourRun(p, cup, start, { l0: 3.0, l1: 3.8, p1: 7.0, b1: 7.8 });
         return t => {
           fire(t, 1 - ramp(t, 2.8, 3.1));
           const gurgle = t > 1.4 && t < 2.8 ? -Math.abs(Math.sin(t * 22)) * 1.4 : 0;
-          lid.setAttribute("transform", `translate(0 ${gurgle})`);
-          const lift = ease(ramp(t, 2.9, 3.7)), pour = ease(ramp(t, 3.7, 7.0)), back = ease(ramp(t, 7.0, 7.8));
-          const m = move(lift, pour, back);
-          const up = 78 - 18 * ease(ramp(t, 0.8, 2.8));             // coffee rising into the top chamber
-          fill(lift > 0 ? m.surface : up, m.angle);
-          const y = cup.level(pour);
-          pourStream(m.tip[0], m.tip[1], 29, y, 2.4, 1.7, t > 3.7 && t < 7.0);
+          lid.setAttribute("transform", `translate(0 ${f1(gurgle)})`);
+          if (t < 3.0) {
+            // coffee rising into the top chamber
+            p.set(0, start * ease(ramp(t, 0.8, 2.8)), 0);
+            cup.level(0);
+            pour(0, 0, 0, 0, 0, 0, false);
+            return;
+          }
+          const m = run(t);
+          pour(m.tip[0], m.tip[1], 29, m.cupY, 2.4, 1.7, m.pouring);
         };
       }
     },
@@ -418,20 +525,27 @@
       g.style.display = "none";
       return { ...scene, g, update: scene.build(g) };
     });
-    const label = s => `${s.name} · ${s.place}`;
+    // the caption is always two lines (method, then place), so it never changes height
+    const label = s => {
+      if (!caption) return;
+      caption.innerHTML = `<span class="brew-name"></span><span class="brew-place"></span>`;
+      caption.firstChild.textContent = s.name;
+      caption.lastChild.textContent = s.place;
+    };
 
     if (still && typeof still === "object") {
       const s = scenes[still.scene];
       s.g.style.display = "";
       s.update(still.time);
-      if (caption) caption.textContent = label(s);
-      return;
+      label(s);
+      return s.update;
     }
 
-    let i = 0, t = 0, slide = -1, last = 0, raf = null, visible = true;
+    let i = 0, t = 0, slide = -1, last = 0, raf = null, visible = true, shown = null;
     scenes[0].g.style.display = "";
     scenes[0].update(0);
-    if (caption) caption.textContent = label(scenes[0]);
+    label(scenes[0]);
+    shown = scenes[0];
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       scenes[0].update(scenes[0].duration);    // one still frame: a full cup
@@ -463,8 +577,9 @@
         const e = ease(Math.min(1, slide / SLIDE));
         place(cur, next, e);
         if (caption) {
-          caption.style.opacity = Math.abs(1 - 2 * e);
-          caption.textContent = label(e < 0.5 ? cur : next);
+          caption.style.opacity = f1(Math.abs(1 - 2 * e));
+          const want = e < 0.5 ? cur : next;
+          if (want !== shown) { label(want); shown = want; }
         }
         if (slide >= SLIDE) {
           cur.g.style.display = "none";
