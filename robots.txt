@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dynamics-cafe.github.io/sitemap.xml
