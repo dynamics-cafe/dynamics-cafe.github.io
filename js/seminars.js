@@ -331,27 +331,9 @@ function brewingCard(after, isNext) {
     <p class="muted">${isNext ? "Next seminar" : "Upcoming seminar"}</p>
 
     <div class="brew">
-      <div class="brew-art" aria-hidden="true">
-        <svg class="brew-doodle" viewBox="0 0 120 120" width="128" height="128" focusable="false">
-          <defs>
-            <clipPath id="brew-cup"><path d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" /></clipPath>
-          </defs>
-          <rect class="line" x="18" y="10" width="84" height="104" rx="9" />
-          <path class="line" d="M18 42 H102" />
-          <circle class="line" cx="38" cy="26" r="8" />
-          <path class="line needle" d="M38 26 L42 21" />
-          <circle class="knob" cx="80" cy="26" r="2.6" />
-          <circle class="knob" cx="90" cy="26" r="2.6" />
-          <path class="line" d="M52 42 V47 H68 V42" />
-          <path class="line" d="M47 47 H73 L70 55 H50 Z" />
-          <path class="line" d="M73 50 H93" />
-          <path class="line" d="M57 55 V58 M63 55 V58" />
-          <path class="stream" d="M57 60 V89 M63 60 V89" />
-          <g clip-path="url(#brew-cup)"><rect class="coffee" x="47" y="89" width="26" height="18" /></g>
-          <path class="line" d="M47 90 H73 V97 Q73 106 64 106 H56 Q47 106 47 97 Z" />
-          <path class="line" d="M73 93 Q80 93 80 98 Q80 102 72 102" />
-          <path class="line" d="M30 108.5 H90" />
-        </svg>
+      <div class="brew-figure">
+        <div class="brew-art" aria-hidden="true"></div>
+        <p class="brew-caption" aria-hidden="true"></p>
       </div>
 
       <div class="brew-text">
@@ -430,6 +412,7 @@ async function loadSeminars() {
       track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f.querySelector("img")))
     );
     setupDeck(track, nextCard);
+    if (window.BrewDoodle) track.querySelectorAll(".brew-art").forEach(art => window.BrewDoodle.mount(art));
 
   } catch (error) {
 
