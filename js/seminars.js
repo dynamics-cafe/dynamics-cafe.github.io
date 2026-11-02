@@ -305,7 +305,14 @@ function setupDeck(track, home) {
     next.disabled = i >= last;
     prevLabel.textContent = i === start ? "Past seminars" : "Earlier";
     nextLabel.textContent = i === start ? "Upcoming" : "Later";
-    fitHeight();
+  };
+
+  // The strip takes the height of the card on show, but only once the movement has stopped:
+  // changing the height mid-swipe makes the browser jump to another card.
+  let dragging = false, settleTimer = null;
+  const settle = () => {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => { if (!dragging) fitHeight(); }, 140);
   };
 
   if (slides.length > 1) {
@@ -322,7 +329,54 @@ function setupDeck(track, home) {
       if (event.key === "ArrowLeft") { goTo(current() - 1); event.preventDefault(); }
       if (event.key === "ArrowRight") { goTo(current() + 1); event.preventDefault(); }
     });
-    track.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+    track.addEventListener("scroll", () => { requestAnimationFrame(update); settle(); }, { passive: true });
+
+    // Phones: the swipe is handled here, so one swipe always moves exactly one card
+    // (the browser's own snapping overshoots or bounces back on a quick flick).
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      track.classList.add("swipe");
+      let x0 = null, y0 = 0, left0 = 0, from = 0, lock = null, lastX = 0, lastT = 0, vx = 0;
+
+      track.addEventListener("touchstart", event => {
+        if (event.touches.length !== 1) { x0 = null; return; }
+        const t = event.touches[0];
+        x0 = lastX = t.clientX; y0 = t.clientY; lastT = event.timeStamp;
+        left0 = track.scrollLeft; from = current(); lock = null; vx = 0;
+      }, { passive: true });
+
+      track.addEventListener("touchmove", event => {
+        if (x0 === null || lock === "y") return;
+        const t = event.touches[0];
+        const dx = t.clientX - x0, dy = t.clientY - y0;
+        if (!lock) {
+          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+          lock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";   // sideways swipe, or a page scroll
+          if (lock === "y") return;
+          dragging = true;
+        }
+        event.preventDefault();
+        const dt = event.timeStamp - lastT;
+        if (dt > 0) vx = 0.7 * ((t.clientX - lastX) / dt) + 0.3 * vx;
+        lastX = t.clientX; lastT = event.timeStamp;
+        track.scrollLeft = Math.max(0, Math.min(slides[last].offsetLeft, left0 - dx));
+      }, { passive: false });
+
+      const release = () => {
+        if (x0 === null) return;
+        const swiped = lock === "x";
+        const dx = lastX - x0;
+        x0 = null; lock = null; dragging = false;
+        if (!swiped) return;
+        const far = Math.min(60, track.clientWidth * 0.18);
+        let target = from;
+        if (Math.abs(vx) > 0.3) target = from + (vx < 0 ? 1 : -1);      // a flick
+        else if (Math.abs(dx) > far) target = from + (dx < 0 ? 1 : -1); // a slow drag past the threshold
+        goTo(target);
+        settle();
+      };
+      track.addEventListener("touchend", release);
+      track.addEventListener("touchcancel", release);
+    }
   }
 
   // phones fire "resize" whenever the address bar slides while scrolling: only react to width changes
@@ -332,18 +386,21 @@ function setupDeck(track, home) {
     lastWidth = window.innerWidth;
     track.scrollTo({ left: slides[current()].offsetLeft, behavior: "auto" });
     update();
+    fitHeight();
   });
   if ("ResizeObserver" in window) {
-    const watcher = new ResizeObserver(fitHeight);
+    const watcher = new ResizeObserver(() => { if (!dragging) fitHeight(); });
     slides.forEach(s => watcher.observe(s));
   }
 
   // start on the next seminar: past ones wait on its left, upcoming ones on its right
   goTo(start, false);
   update();
+  fitHeight();
   requestAnimationFrame(() => {
     goTo(start, false);
     update();
+    fitHeight();
     track.classList.add("ready");
   });
 }

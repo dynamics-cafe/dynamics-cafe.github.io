@@ -1157,6 +1157,12 @@ footer a {
   border-radius: 12px;
 }
 
+/* phones: the script moves the strip one card per swipe, so the browser's snapping is off */
+.deck-track.swipe {
+  scroll-snap-type: none;
+  touch-action: pan-y pinch-zoom;
+}
+
 .deck-track::-webkit-scrollbar {
   display: none;
 }
