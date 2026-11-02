@@ -178,8 +178,8 @@ function seminarCard(seminar, past) {
   const note = past
     ? ""
     : `<p class="meeting-note">
-         Each seminar has its own meeting link:
-         please don't reuse links from past seminars.
+         New seminar, new link ☕ Grab it here each time,
+         old ones won't take you to the right room.
        </p>`;
 
   return `
