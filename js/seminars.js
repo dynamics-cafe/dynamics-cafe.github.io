@@ -178,7 +178,7 @@ function seminarCard(seminar, past) {
   const note = past
     ? ""
     : `<p class="meeting-note">
-         New seminar, new link ☕ Grab it here each time,
+         New seminar, new link. Grab it here each time,
          old ones won't take you to the right room.
        </p>`;
 
