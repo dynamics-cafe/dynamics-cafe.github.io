@@ -9,6 +9,7 @@
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touch = window.matchMedia("(pointer: coarse)").matches;
 
   // Logo colours: caramel, orange, copper, coffee
   const COLORS = ["#E8A858", "#E88838", "#C4661F", "#8A4A1C", "#664221"];
@@ -125,10 +126,18 @@
   for (let i = 0; i < 160; i++) { t += 0.016; step(1); }
   frame();
 
+  // Phones fire "resize" every time the address bar slides in or out while scrolling.
+  // The canvas is sized to the largest viewport (CSS 100lvh), so those resizes don't change
+  // it: only restart the picture when the canvas itself really changed size (rotation,
+  // window resize), otherwise the trails would be wiped mid-scroll.
   let rt;
   window.addEventListener("resize", () => {
     clearTimeout(rt);
-    rt = setTimeout(() => { resize(); for (let i = 0; i < 120; i++) { t += 0.016; step(1); } }, 150);
+    rt = setTimeout(() => {
+      if (canvas.clientWidth === w && (canvas.clientHeight === h || touch)) return;
+      resize();
+      for (let i = 0; i < 120; i++) { t += 0.016; step(1); }
+    }, 150);
   });
   document.addEventListener("visibilitychange", () => {
     visible = !document.hidden;

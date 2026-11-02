@@ -164,6 +164,7 @@ function seminarCard(seminar, past) {
          <div class="abstract-body">
            ${String(seminar.abstract).split(/\n\s*\n/).map(t => `<p class="abstract-text">${escapeHtml(t.trim())}</p>`).join("")}
          </div>
+         <button class="abstract-more" type="button" aria-expanded="false" hidden>Read the full abstract</button>
        </section>`
     : "";
 
@@ -229,6 +230,40 @@ function hydratePortraits(root) {
   });
 }
 
+// Long abstracts on phones: the CSS shows the first lines with a fade; the button opens the rest.
+// The button only appears when something is actually cut off (never on wide screens).
+function setupAbstracts(root) {
+  const abstracts = [...root.querySelectorAll(".abstract")];
+  const check = () => abstracts.forEach(a => {
+    const body = a.querySelector(".abstract-body");
+    const button = a.querySelector(".abstract-more");
+    if (a.classList.contains("is-open")) return;
+    const cut = body.scrollHeight > body.clientHeight + 4;
+    button.hidden = !cut;
+    a.classList.toggle("is-cut", cut);
+  });
+  abstracts.forEach(a => {
+    const button = a.querySelector(".abstract-more");
+    button.addEventListener("click", () => {
+      const open = a.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", String(open));
+      button.textContent = open ? "Show less" : "Read the full abstract";
+      if (!open) {
+        check();
+        if (a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: "start" });
+      }
+    });
+  });
+  check();
+  window.addEventListener("load", check);
+  let lastWidth = window.innerWidth;
+  window.addEventListener("resize", () => {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
+    check();
+  });
+}
+
 // One swipeable strip: past seminars, the next seminar (shown first), upcoming ones, then "Brewing".
 function setupDeck(track, home) {
   const bar = document.getElementById("deck-bar");
@@ -290,7 +325,11 @@ function setupDeck(track, home) {
     track.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
   }
 
+  // phones fire "resize" whenever the address bar slides while scrolling: only react to width changes
+  let lastWidth = window.innerWidth;
   window.addEventListener("resize", () => {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     track.scrollTo({ left: slides[current()].offsetLeft, behavior: "auto" });
     update();
   });
@@ -408,9 +447,13 @@ async function loadSeminars() {
     nextCard.insertAdjacentHTML("beforebegin", pastSeminars.map(seminar => slide(seminar, "Past seminar", true)).join(""));
 
     hydratePortraits(track);
-    window.addEventListener("resize", () =>
-      track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f.querySelector("img")))
-    );
+    setupAbstracts(track);
+    let lastWidth = window.innerWidth;
+    window.addEventListener("resize", () => {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+      track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f.querySelector("img")));
+    });
     setupDeck(track, nextCard);
     if (window.BrewDoodle) track.querySelectorAll(".brew-art").forEach(art => window.BrewDoodle.mount(art));
 
