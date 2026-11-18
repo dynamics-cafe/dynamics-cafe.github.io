@@ -34,8 +34,8 @@ The footer credit reads: "Human taste, Claude's code, a lot of coffee".
 
 ## Link preview and logo files
 
-When the site link is shared (Google Chat, WhatsApp, LinkedIn, email), apps show `img/og-image.jpg`, a
-1200x630 card set in the `og:image` tags of `index.html`. Keep that file small (well under 1 MB):
+When the site link is shared (Google Chat, WhatsApp, LinkedIn, email), apps show `img/preview-card.jpg`, a
+2400x1260 card (the standard 1.91:1 shape, at double resolution) set in the `og:image` tags of `index.html`. Keep that file small (well under 1 MB):
 when a preview image is too large, apps pick a photo from the page instead. After changing it, rename
 the file or add `?v=2` to the shared link, since apps cache old previews.
 
