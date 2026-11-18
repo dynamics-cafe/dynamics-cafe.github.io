@@ -15,6 +15,7 @@
   const COLORS = ["#E8A858", "#E88838", "#C4661F", "#8A4A1C", "#664221"];
 
   let w, h, dpr, particles, t = 0, raf = null, visible = true, portrait = false;
+  let maxDpr = 2, density = 1, frozen = false;   // lowered on slow computers, see watch()
 
   // Field lives in a unit-ish square scaled to the canvas height.
   function field(x, y, t) {
@@ -42,7 +43,7 @@
   }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
     w = canvas.clientWidth;
     h = canvas.clientHeight;
     canvas.width = w * dpr;
@@ -51,7 +52,7 @@
     ctx.clearRect(0, 0, w, h);
     portrait = h > w;
     // same particle density per unit of the phase portrait on every screen
-    const n = Math.round(Math.min(420, (90 * W() * H()) / (scale() * scale())));
+    const n = Math.round(density * Math.min(420, (90 * W() * H()) / (scale() * scale())));
     particles = Array.from({ length: n }, () => spawn({}, true));
   }
 
@@ -108,7 +109,37 @@
     ctx.globalAlpha = 1;
   }
 
-  function frame() {
+  // Slow computers (e.g. no graphics acceleration): if most frames keep arriving late,
+  // draw at normal instead of retina resolution, then with half the particles, and as a
+  // last resort keep the picture still, so the page itself never feels sluggish.
+  const fallbacks = [
+    () => { if (dpr <= 1) return false; maxDpr = 1; return true; },
+    () => { density = 0.5; return true; },
+    () => { frozen = true; return false; },
+  ];
+  let seen = 0, late = 0, span = -1000, lastT = 0;   // the first second after loading is not judged
+  function watch(now) {
+    const dt = lastT ? now - lastT : 0;
+    lastT = now;
+    if (!dt || dt > 400) return;          // a pause (tab switched, window hidden), not slowness
+    span += dt;
+    if (span <= 0) return;
+    seen++;
+    if (dt > 26) late++;                  // under ~38 frames per second
+    if (span < 1500 || seen < 8) return;  // judge every second and a half
+    if (late > seen / 2) {
+      while (fallbacks.length) {
+        const redraw = fallbacks.shift()();
+        if (redraw) { resize(); for (let i = 0; i < 60; i++) { t += 0.016; step(1); } }
+        if (redraw || frozen) break;
+      }
+    }
+    seen = late = span = 0;
+  }
+
+  function frame(now) {
+    watch(now);
+    if (frozen) { raf = null; return; }
     t += 0.016;
     step(1);
     raf = visible ? requestAnimationFrame(frame) : null;
@@ -124,7 +155,7 @@
 
   // warm up so the first paint already has trails
   for (let i = 0; i < 160; i++) { t += 0.016; step(1); }
-  frame();
+  raf = requestAnimationFrame(frame);
 
   // Phones fire "resize" every time the address bar slides in or out while scrolling.
   // The canvas is sized to the largest viewport (CSS 100lvh), so those resizes don't change
@@ -141,6 +172,7 @@
   });
   document.addEventListener("visibilitychange", () => {
     visible = !document.hidden;
-    if (visible && !raf) raf = requestAnimationFrame(frame);
+    lastT = 0;
+    if (visible && !raf && !frozen) raf = requestAnimationFrame(frame);
   });
 })();
