@@ -67,8 +67,7 @@ a {
 header {
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 241, 214, 0.8);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 241, 214, 0.93);
 }
 
 nav {
@@ -159,7 +158,11 @@ nav .links a:hover {
    Hero trajectory background
    ================================================== */
 
-/* Sized to the largest viewport (100lvh): on phones the address bar slides in and out while
+/* No panel blurs what is behind it (backdrop-filter): re-blurring the moving background on
+   every frame made the page crawl on computers without graphics acceleration (often Chrome
+   on Linux). The panels are nearly opaque instead.
+
+   Sized to the largest viewport (100lvh): on phones the address bar slides in and out while
    scrolling, and a canvas that followed it would be stretched and redrawn on every scroll. */
 .trajectory-background {
   position: fixed;
@@ -250,11 +253,10 @@ section h2 {
 .event {
   max-width: none;
   padding: 36px 40px 40px;
-  background: rgba(251, 230, 192, 0.85);
+  background: rgba(251, 230, 192, 0.93);
   border: 1px solid var(--line);
   border-left: 4px solid var(--copper);
   border-radius: 12px;
-  backdrop-filter: blur(4px);
 }
 
 .event h3 {
@@ -322,8 +324,7 @@ section h2 {
 footer {
   padding: 35px 0;
   border-top: 1px solid var(--line);
-  background: rgba(255, 241, 214, 0.8);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 241, 214, 0.93);
   color: var(--muted);
   font-size: 0.9rem;
 }
@@ -452,10 +453,9 @@ footer a {
   grid-template-columns: 1.05fr 1fr;
   gap: 48px;
   padding: 44px;
-  background: rgba(255, 241, 214, 0.82);
+  background: rgba(255, 241, 214, 0.93);
   border: 1px solid var(--line);
   border-radius: 20px;
-  backdrop-filter: blur(6px);
   box-shadow: 0 18px 40px rgba(72, 24, 8, 0.08);
 }
 
@@ -849,8 +849,7 @@ footer a {
   gap: 10px;
   padding: 11px 20px;
   border: 1px solid var(--line);
-  background: rgba(255, 241, 214, 0.85);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 241, 214, 0.94);
   box-shadow: 0 6px 16px rgba(72, 24, 8, 0.08);
 }
 
@@ -882,10 +881,9 @@ footer a {
   margin-top: 14px;
   max-width: 640px;
   padding: 12px 18px;
-  background: rgba(255, 241, 214, 0.85);
+  background: rgba(255, 241, 214, 0.94);
   border: 1px solid var(--line);
   border-radius: 12px;
-  backdrop-filter: blur(6px);
 }
 
 .calendar-help summary {
@@ -1108,13 +1106,12 @@ footer a {
   padding: 9px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 241, 214, 0.9);
+  background: rgba(255, 241, 214, 0.95);
   color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  backdrop-filter: blur(6px);
   transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
 }
 
@@ -1511,19 +1508,6 @@ footer a {
    ================================================== */
 
 @media (max-width: 650px) {
-
-  /* Blurring the moving background behind every panel, every frame, is what makes
-     phones stutter while scrolling: use solid panels instead. */
-  header,
-  footer,
-  .event,
-  .talk-panel,
-  .calendar-cta .button,
-  .calendar-help,
-  .deck-btn {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 
   header,
   footer {
