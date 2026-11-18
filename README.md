@@ -31,3 +31,13 @@ This website was built by the Dynamics Cafe organisers with the help of an AI co
 (Claude, by Anthropic). The organisers made the design decisions and chose the content; the code was
 written by the assistant. The organisers review and maintain it, and are responsible for what it says.
 The footer credit reads: "Human taste, Claude's code, a lot of coffee".
+
+## Link preview and logo files
+
+When the site link is shared (Google Chat, WhatsApp, LinkedIn, email), apps show `img/og-image.jpg`, a
+1200x630 card set in the `og:image` tags of `index.html`. Keep that file small (well under 1 MB):
+when a preview image is too large, apps pick a photo from the page instead. After changing it, rename
+the file or add `?v=2` to the shared link, since apps cache old previews.
+
+`logo.png` is the full-size original (1.4 MB). The page itself uses the small copies
+`img/logo-256.webp` (header) and `img/favicon-192.png` (browser tab icon).
