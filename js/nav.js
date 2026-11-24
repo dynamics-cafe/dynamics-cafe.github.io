@@ -35,7 +35,7 @@
       <div class="container">
         <nav aria-label="Main">
           <a class="logo" href="./">
-            <img src="img/logo-256.webp" alt="" class="nav-logo" width="256" height="246">
+            <img src="img/logo-512.webp" alt="" class="nav-logo" width="512" height="501">
             <span>Dynamics Cafe<small>Seminar Group</small></span>
           </a>
           <div class="nav-right">

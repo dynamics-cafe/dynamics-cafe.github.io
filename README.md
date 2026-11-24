@@ -79,5 +79,7 @@ Google search results use `img/logo-square.jpg` (1200x1200), named in the struct
 block of `index.html`. Google updates its thumbnail only when it recrawls the page; to speed it up, use
 URL Inspection, then Request indexing, in Google Search Console.
 
-`logo.png` is the full-size original (1.4 MB). The page itself uses the small copies
-`img/logo-256.webp` (header) and `img/favicon-192.png` (browser tab icon).
+`logo.png` is a 2048 px export of the logo (the editable vector originals, Standard, Christmas and
+Master, are kept by the organisers, not in this repository: they are 18-24 MB each). The page uses
+small copies exported from the Standard version: `img/logo-512.webp` (header), `img/favicon-32.png` and
+`img/favicon-192.png` (browser tab), and `img/apple-touch-icon.png` (phone home screen, on cream).
