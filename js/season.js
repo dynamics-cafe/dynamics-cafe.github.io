@@ -21,7 +21,7 @@
   const FEATURES = ["logo", "footer", "globe", "garland", "hat", "lights"];
   // Master switch. false: hidden from visitors, shown only with ?xmas=on (preview).
   // true: on by date, START to END.
-  const LIVE = false;
+  const LIVE = true;
 
   function today() {
     const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", month: "numeric", day: "numeric" })
