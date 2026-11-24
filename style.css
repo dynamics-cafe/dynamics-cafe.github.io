@@ -104,17 +104,52 @@ nav {
 
 nav .links {
   display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
 }
 
 nav .links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 999px;
   color: var(--text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
   text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 nav .links a:hover {
   color: var(--ink);
+  background: rgba(232, 136, 56, 0.14);
+}
+
+/* the page you are on */
+nav .links a[aria-current="page"] {
+  color: var(--cream);
+  background: var(--ink);
+}
+
+nav .links .nav-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-left: 2px;
+}
+
+nav .links .nav-icon svg {
+  fill: currentColor;
+}
+
+nav .links .nav-icon:hover {
+  color: #0A66C2;
 }
 
 
@@ -386,10 +421,6 @@ footer a {
     width: 85px;
   }
 
-  nav .links {
-    gap: 12px;
-    font-size: 0.9rem;
-  }
 
   .hero {
     padding: 80px 0 65px;
@@ -1555,10 +1586,26 @@ footer a {
     width: 52px;
   }
 
+  /* links get their own row under the logo, spread across the width */
+  nav {
+    flex-wrap: wrap;
+  }
+
   nav .links {
-    flex-wrap: nowrap;
-    gap: 14px;
-    font-size: 0.88rem;
+    width: 100%;
+    gap: 2px;
+  }
+
+  nav .links a {
+    flex: 1 1 auto;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  nav .links .nav-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
   }
 
   /* hero */
@@ -2015,11 +2062,6 @@ footer a {
 }
 
 @media (max-width: 650px) {
-  /* phones: LinkedIn stays in the footer, so the header fits on one line */
-  nav .links .wide-only {
-    display: none;
-  }
-
   .logo {
     min-width: 0;
   }

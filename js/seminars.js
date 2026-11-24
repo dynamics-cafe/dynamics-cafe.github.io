@@ -527,3 +527,23 @@ async function loadSeminars() {
 }
 
 loadSeminars();
+
+/* Arriving with a link such as ./#contact: the browser jumps to the section before the seminar
+   cards (and photos, fonts) have loaded, and they then push it down the page. Keep the section in
+   place while the page settles, until the visitor scrolls on their own. */
+(function keepAnchor() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  let stop = false;
+  const quit = () => { stop = true; };
+  ["wheel", "touchstart", "keydown", "mousedown"].forEach(t => window.addEventListener(t, quit, { once: true, passive: true }));
+  const place = () => {
+    const el = document.getElementById(id);
+    if (stop || !el) return;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
+  };
+  const ro = new ResizeObserver(place);
+  ro.observe(document.body);
+  window.addEventListener("load", place);
+  setTimeout(() => { quit(); ro.disconnect(); }, 4000);
+})();
