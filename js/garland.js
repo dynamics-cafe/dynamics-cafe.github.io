@@ -1,204 +1,411 @@
-/* Christmas garlands (part of js/season.js's "garland" decoration).
+/* Christmas garlands (the "garland" decoration of js/season.js).
 
-   Every card gets an evergreen garland draped along its top edge, drawn in the site's own
-   illustration style (brown ink line work, flat colour), with a different mix of hanging
-   ornaments on each card. Drawn to the card's real width, so nothing is ever stretched. */
+   Hierarchy, so that nothing competes:
+   - the next-seminar card gets the one featured garland, the richest piece on the site;
+   - the team page gets one garland swagged across each row of cards, with a different
+     ornament hanging over each person's card;
+   - the "Give a talk" panel gets a single sprig on one corner;
+   - everything else stays as it is (the header has the lights and the hat).
+
+   One visual language throughout: dark ink outlines and flat painted fills, like the logo,
+   in a small palette (evergreen, cranberry, brass and the site's copper).
+
+   The ornaments hang like damped pendulums: they settle gently when the page opens and
+   swing when the pointer brushes them (not for visitors who ask for reduced motion). */
 (function () {
   if (!(window.DynamicsCafeSeason && window.DynamicsCafeSeason.has("garland"))) return;
 
   const NS = "http://www.w3.org/2000/svg";
-  const INK = "#4A1D0B";
-  const STRING = "#9A6B3F";
-  const NEEDLES = ["#2E6638", "#3B7A45", "#4C8C50", "#5E9C5A"];
-  const CARDS = ".barista, .talk-panel, .event, .policy-toc, .counter-card";
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // small, deterministic random numbers: the same card always gets the same garland
+  const INK = "#3A160A";
+  const GREEN = { back: "#1F4A31", mid: "#2D6140", front: "#4A7F52", stem: "#2A3A1E" };
+  const CRAN = "#A8323A", CRAN_DARK = "#7A2229";
+  const BRASS = "#C9A24A", BRASS_LIGHT = "#E6C77A";
+  const COPPER = "#D9782E";
+  const STRING = "#8A6A44";
+
   function rng(seed) {
     let s = seed % 2147483647; if (s <= 0) s += 2147483646;
     return () => (s = s * 16807 % 2147483647) / 2147483647;
   }
+  const f = n => n.toFixed(1);
 
-  /* ---------- ornaments (drawn around 0,0 = where the string ends) ---------- */
+  /* ---------- ornaments: drawn hanging from (0,0), the end of their string ---------- */
 
-  const O = {
-    bauble(color, band) {
-      return `<rect x="-2.6" y="-1" width="5.2" height="4" rx="1" fill="#C9A13B" stroke="${INK}" stroke-width=".8"/>
-        <circle cx="0" cy="10" r="7.5" fill="${color}" stroke="${INK}" stroke-width="1.1"/>
-        ${band ? `<path d="M-7.2 9 Q0 12.5 7.2 9" fill="none" stroke="${band}" stroke-width="1.6"/>
-                  <path d="M-6.6 13 Q0 16 6.6 13" fill="none" stroke="${band}" stroke-width=".9" stroke-dasharray="1.2 1.6"/>` : ""}
-        <ellipse cx="-2.6" cy="7" rx="1.6" ry="2.4" fill="#fff" opacity=".55" transform="rotate(25 -2.6 7)"/>`;
-    },
-    star() {
-      const p = [];
-      for (let i = 0; i < 10; i++) {
-        const r = i % 2 ? 3.6 : 8.4, a = -Math.PI / 2 + i * Math.PI / 5;
-        p.push((r * Math.cos(a)).toFixed(2) + "," + (9 + r * Math.sin(a)).toFixed(2));
-      }
-      return `<polygon points="${p.join(" ")}" fill="#E8B43A" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>
-        <circle cx="-1.6" cy="7" r="1.1" fill="#fff" opacity=".7"/>`;
-    },
-    snowflake() {
-      let arms = "";
-      for (let i = 0; i < 6; i++) {
-        const a = i * 60;
-        arms += `<g transform="rotate(${a} 0 10)"><line x1="0" y1="10" x2="0" y2="1.5"/><line x1="0" y1="4.6" x2="-2.4" y2="2.6"/><line x1="0" y1="4.6" x2="2.4" y2="2.6"/></g>`;
-      }
-      return `<g stroke="#4F7FA8" stroke-width="1.3" stroke-linecap="round">${arms}</g><circle cx="0" cy="10" r="1.4" fill="#4F7FA8"/>`;
-    },
-    bell() {
-      return `<path d="M-6.5 14 C-6.5 6 -4.5 2.5 0 2.5 C4.5 2.5 6.5 6 6.5 14 L8 16 L-8 16 Z" fill="#E1A83A" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>
-        <circle cx="0" cy="17.5" r="1.8" fill="#C9A13B" stroke="${INK}" stroke-width=".8"/>
-        <path d="M-1 2.5 C-5 -1.5 -7 2 -3.5 3.2 M1 2.5 C5 -1.5 7 2 3.5 3.2" fill="#C8312B" stroke="${INK}" stroke-width=".8"/>
-        <path d="M-3.5 7 Q-4.2 10 -4.2 13" stroke="#fff" stroke-width="1" opacity=".6" fill="none"/>`;
-    },
-    cup() {
-      return `<path d="M-7 4 H6 V11 C6 15 3.5 17 -0.5 17 C-4.5 17 -7 15 -7 11 Z" fill="#FFF8EC" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>
-        <path d="M6 6.5 C10 6.5 10 12 5.6 12" fill="none" stroke="${INK}" stroke-width="1.1"/>
-        <ellipse cx="-0.5" cy="4.6" rx="6" ry="1.4" fill="#7A3E16"/>
-        <path d="M-7 10 H6" stroke="#C8312B" stroke-width="1.4"/>
-        <path d="M-2.5 1.5 C-4 -0.5 -1 -1.5 -2.5 -3.5 M1.5 1.5 C0 -0.5 3 -1.5 1.5 -3.5" stroke="${STRING}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".8"/>`;
-    },
-    bean() {
-      return `<ellipse cx="0" cy="10" rx="6" ry="8.2" fill="#7A3E16" stroke="${INK}" stroke-width="1.1" transform="rotate(-18 0 10)"/>
-        <path d="M-1.2 3 C2.8 6.5 -3.6 12.5 1.2 17" fill="none" stroke="#E9C79A" stroke-width="1.3" stroke-linecap="round"/>`;
-    },
-    cone() {
-      let s = "";
-      for (let row = 0; row < 4; row++) {
-        const y = 4 + row * 3.6, n = row === 0 ? 2 : 3 - (row === 3 ? 1 : 0), w = 6.4 - row * 0.9;
-        for (let k = 0; k < n; k++) {
-          const x = (k - (n - 1) / 2) * w * 0.75;
-          s += `<path d="M${(x - w / 2).toFixed(1)} ${y} Q${x.toFixed(1)} ${(y + 5.2).toFixed(1)} ${(x + w / 2).toFixed(1)} ${y}" fill="#A8672F" stroke="${INK}" stroke-width=".9"/>`;
-        }
-      }
-      return `<path d="M-1.2 0 L1.2 0 L1.2 4 L-1.2 4 Z" fill="#6B3A17"/>${s}`;
-    }
-  };
+  const cap = (w = 6) => `<path d="M-1.6 -0.6 a1.6 1.6 0 1 1 3.2 0" fill="none" stroke="${INK}" stroke-width="1"/>
+    <rect x="${-w / 2}" y="0" width="${w}" height="4.2" rx="1" fill="${BRASS}" stroke="${INK}" stroke-width="1"/>`;
 
-  // what hangs where: each card starts at a different point of the list, so neighbours differ
-  const SET = [
-    () => O.bauble("#C8312B", "#F2D28B"),
-    () => O.star(),
-    () => O.cup(),
-    () => O.bauble("#2F7A48", "#F2D28B"),
-    () => O.snowflake(),
-    () => O.bell(),
-    () => O.bean(),
-    () => O.bauble("#3D74B4", null),
-    () => O.cone(),
-    () => O.bauble("#D6A33A", "#C8312B")
-  ];
-
-  /* ---------- the garland ---------- */
-
-  function bow(x, y) {
-    return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})">
-      <path d="M0 0 C-9 -7 -12 2 -2 1.5 M0 0 C9 -7 12 2 2 1.5" fill="#C8312B" stroke="${INK}" stroke-width="1"/>
-      <path d="M-1 1 L-5 10 M1 1 L5 9" stroke="#C8312B" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M-1 1 L-5 10 M1 1 L5 9" stroke="${INK}" stroke-width=".6" fill="none" opacity=".6"/>
-      <circle cx="0" cy=".6" r="2.2" fill="#A82420" stroke="${INK}" stroke-width=".8"/></g>`;
+  function bauble(fill, shade, decor) {
+    const band = decor === "band"
+      ? `<path d="M-11 12.5 Q0 17 11 12.5" fill="none" stroke="${INK}" stroke-width="3.6"/>
+         <path d="M-11 12.5 Q0 17 11 12.5" fill="none" stroke="${BRASS}" stroke-width="2.2"/>`
+      : decor === "dots"
+        ? [-6, 0, 6].map((x, i) => `<circle cx="${x}" cy="${i === 1 ? 16.4 : 15.4}" r="1.5" fill="${BRASS_LIGHT}" stroke="${INK}" stroke-width=".6"/>`).join("")
+        : "";
+    return `${cap()}
+      <circle cx="0" cy="15" r="11.2" fill="${fill}" stroke="${INK}" stroke-width="1.4"/>
+      <path d="M6.5 6.5 A11 11 0 0 1 4 25.4 A10 10 0 0 0 6.5 6.5Z" fill="${shade}" opacity=".85"/>
+      ${band}
+      <ellipse cx="-4.2" cy="10.4" rx="2" ry="3.4" fill="#fff" opacity=".6" transform="rotate(30 -4.2 10.4)"/>`;
   }
 
-  function berries(x, y, r) {
-    let s = "";
-    [[-2.6, 0.6], [2.4, 1.2], [0, -1.8]].forEach(([dx, dy]) => {
-      const cx = x + dx + (r() - 0.5), cy = y + dy + (r() - 0.5);
-      s += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5" fill="#C8312B" stroke="${INK}" stroke-width=".7"/>
-            <circle cx="${(cx - 0.8).toFixed(1)}" cy="${(cy - 0.8).toFixed(1)}" r=".7" fill="#fff" opacity=".7"/>`;
+  function star() {
+    const p = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? 5.2 : 12, a = -Math.PI / 2 + i * Math.PI / 5;
+      p.push([r * Math.cos(a), 13 + r * Math.sin(a)]);
+    }
+    const pts = k => p.map(([x, y]) => f(x * k) + "," + f(13 + (y - 13) * k)).join(" ");
+    return `<path d="M0 0 V1.8" stroke="${INK}" stroke-width="1"/>
+      <polygon points="${pts(1)}" fill="${BRASS}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>
+      <polygon points="${pts(0.45)}" fill="${BRASS_LIGHT}" opacity=".7"/>`;
+  }
+
+  function bell() {
+    return `${cap(5)}
+      <path d="M-9 20 C-9 9 -6 4.2 0 4.2 C6 4.2 9 9 9 20 L11 23 L-11 23 Z" fill="${BRASS}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M4 7 C7 10 7.6 15 7.6 20" fill="none" stroke="#A8822F" stroke-width="2.2" opacity=".8"/>
+      <circle cx="0" cy="25" r="2.6" fill="${BRASS_LIGHT}" stroke="${INK}" stroke-width="1"/>
+      <path d="M-3.6 10 Q-5 14 -5 19" stroke="#fff" stroke-width="1.4" opacity=".55" fill="none" stroke-linecap="round"/>
+      <path d="M0 5 C-6 0 -9 5 -3 6 M0 5 C6 0 9 5 3 6" fill="${CRAN}" stroke="${INK}" stroke-width="1"/>`;
+  }
+
+  function cup() {
+    return `${cap(5)}
+      <path d="M-10 6 H9 V15 C9 21 5 24 -0.5 24 C-6 24 -10 21 -10 15 Z" fill="#FFF7EA" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M9 9 C14.5 9 14.5 17 8.6 17" fill="none" stroke="${INK}" stroke-width="1.4"/>
+      <ellipse cx="-0.5" cy="6.8" rx="8.6" ry="2" fill="#6E3512"/>
+      <path d="M-10 14 H9" stroke="${CRAN}" stroke-width="2.4"/>
+      <ellipse cx="-0.5" cy="25.6" rx="13" ry="2.4" fill="#FFF7EA" stroke="${INK}" stroke-width="1.2"/>`;
+  }
+
+  function bean() {
+    return `${cap(5)}
+      <ellipse cx="0" cy="15.5" rx="8.4" ry="11.4" fill="#6E3512" stroke="${INK}" stroke-width="1.4" transform="rotate(-14 0 15.5)"/>
+      <path d="M-1.6 5.4 C4 10 -5 17 1.6 25.6" fill="none" stroke="#E4C08F" stroke-width="1.8" stroke-linecap="round"/>
+      <ellipse cx="-4" cy="11" rx="1.4" ry="3" fill="#fff" opacity=".35" transform="rotate(-14 -4 11)"/>`;
+  }
+
+  function cone() {
+    let scales = "";
+    const rows = [[0, 2], [5.2, 3], [10.4, 3], [15.6, 3], [20.8, 2]];
+    rows.forEach(([y, n], ri) => {
+      const w = 6.6 - Math.abs(ri - 2) * 0.6;
+      for (let k = 0; k < n; k++) {
+        const x = (k - (n - 1) / 2) * w;
+        scales += `<path d="M${f(x - w / 2)} ${f(4.6 + y)} Q${f(x)} ${f(4.6 + y + 7.2)} ${f(x + w / 2)} ${f(4.6 + y)}" fill="#9A5A28" stroke="${INK}" stroke-width="1"/>`;
+      }
     });
+    return `${cap(5)}<ellipse cx="0" cy="17" rx="10" ry="13.4" fill="#6B3A17" stroke="${INK}" stroke-width="1.4"/>${scales}`;
+  }
+
+  function finial(fill, shade) {
+    return `${cap(5)}
+      <path d="M0 4.2 C9 8 11 16 6 24 C4 28 1.5 31 0 36 C-1.5 31 -4 28 -6 24 C-11 16 -9 8 0 4.2Z" fill="${fill}" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M3 7 C9 12 8.4 19 4.6 24.6" fill="none" stroke="${shade}" stroke-width="2.4" opacity=".8"/>
+      <path d="M-8.2 13 H8.2 M-7.2 20 H7.2" stroke="${BRASS_LIGHT}" stroke-width="1.6"/>
+      <path d="M-3.6 9 Q-5.4 13 -4.6 17" stroke="#fff" stroke-width="1.4" opacity=".55" fill="none" stroke-linecap="round"/>`;
+  }
+
+  function snowflake() {
+    let arms = "";
+    for (let i = 0; i < 6; i++) {
+      arms += `<g transform="rotate(${i * 60} 0 14)"><path d="M0 14 V3.4 M0 7.4 L-3.2 4.6 M0 7.4 L3.2 4.6 M0 10.4 L-2.2 8.6 M0 10.4 L2.2 8.6"/></g>`;
+    }
+    return `<path d="M0 0 V3.4" stroke="${STRING}" stroke-width="1"/>
+      <g stroke="${INK}" stroke-width="3.4" stroke-linecap="round" fill="none">${arms}</g>
+      <g stroke="#7FA7C6" stroke-width="1.8" stroke-linecap="round" fill="none">${arms}</g>`;
+  }
+
+  const ORN = {
+    cranberry: () => bauble(CRAN, CRAN_DARK, "band"),
+    evergreen: () => bauble("#2F6A47", "#1F4A31", "dots"),
+    copperBall: () => bauble(COPPER, "#A8561C", "band"),
+    star, bell, cup, bean, cone, snowflake,
+    finial: () => finial(CRAN, CRAN_DARK),
+    copperDrop: () => finial(COPPER, "#A8561C")
+  };
+  const HEIGHT = { star: 26, bell: 28, cup: 28, bean: 28, cone: 31, snowflake: 25, finial: 36, copperDrop: 36 };
+  const oh = k => HEIGHT[k] || 27;
+
+  /* ---------- garland pieces ---------- */
+
+  // one sprig: a short stem with tapered needles, longest at the base
+  function sprig(path, x, y, a, len, r, scale = 1) {
+    const ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len;
+    path.stem += `M${f(x)} ${f(y)} L${f(ex)} ${f(ey)} `;
+    const n = Math.round(len / 2.1);
+    for (let i = 1; i <= n; i++) {
+      const t = i / (n + 1), px = x + (ex - x) * t, py = y + (ey - y) * t;
+      const nl = (1 - t * 0.6) * (5.4 + r() * 1.6) * scale;
+      for (const side of [-1, 1]) {
+        const na = a + side * (0.62 + r() * 0.2);
+        path.needles += `M${f(px)} ${f(py)} L${f(px + Math.cos(na) * nl)} ${f(py + Math.sin(na) * nl)} `;
+      }
+    }
+  }
+
+  function bow(x, y, s = 1) {
+    return `<g transform="translate(${f(x)} ${f(y)}) scale(${s})">
+      <path d="M-1.5 2 L-6.5 13 L-4 12 L-3 14.6 Z M1.5 2 L6 12.6 L3.6 11.8 L2.6 14.4 Z" fill="${CRAN}" stroke="${INK}" stroke-width="1" stroke-linejoin="round"/>
+      <path d="M0 1 C-5 -6 -12 -3 -10.5 2 C-9.5 5.4 -4 4 0 1 Z M0 1 C5 -6 12 -3 10.5 2 C9.5 5.4 4 4 0 1 Z" fill="${CRAN}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M-2.4 0 C-5.6 -2.4 -8 -1 -8 1 M2.4 0 C5.6 -2.4 8 -1 8 1" fill="none" stroke="${CRAN_DARK}" stroke-width="1.2"/>
+      <ellipse cx="0" cy="1.2" rx="2.6" ry="2.4" fill="${CRAN_DARK}" stroke="${INK}" stroke-width="1"/></g>`;
+  }
+
+  function berries(x, y, r, n = 3) {
+    let s = "";
+    const spots = [[-3, 1], [3, 1.6], [0, -2.4], [-5.4, -1.8], [5.2, -1.4]];
+    for (let i = 0; i < n; i++) {
+      const [dx, dy] = spots[i], cx = x + dx + (r() - 0.5) * 0.8, cy = y + dy + (r() - 0.5) * 0.8;
+      s += `<circle cx="${f(cx)}" cy="${f(cy)}" r="2.9" fill="${CRAN}" stroke="${INK}" stroke-width="1"/>
+            <circle cx="${f(cx - 0.9)}" cy="${f(cy - 0.9)}" r=".8" fill="#fff" opacity=".75"/>`;
+    }
     return s;
   }
 
-  function draw(card, index) {
-    const W = card.clientWidth;
-    if (!W) return;
-    const r = rng(9973 * (index + 1));
-    const inset = 16, top = 3;
-    const span = W - inset * 2;
-    const swags = Math.max(2, Math.round(span / 230));
-    const sw = span / swags;
-    const sag = Math.min(24, sw * 0.13);
-    let needles = "", branch = "", deco = "", hang = "";
-    const start = (index * 3) % SET.length;
-    let oi = 0;
+  const layer = (p, col, w) => `<path d="${p.needles}" stroke="${col}" stroke-width="${w}" stroke-linecap="round" fill="none"/>
+    <path d="${p.stem}" stroke="${GREEN.stem}" stroke-width="1.1" stroke-linecap="round" fill="none"/>`;
 
-    for (let k = 0; k < swags; k++) {
-      const x0 = inset + k * sw, x1 = x0 + sw;
-      const cx = (x0 + x1) / 2, cy = top + sag * 2;           // quadratic control point
-      const P = t => [(1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * cx + t * t * x1,
-                      (1 - t) * (1 - t) * top + 2 * (1 - t) * t * cy + t * t * top];
-      const D = t => [2 * (1 - t) * (cx - x0) + 2 * t * (x1 - cx), 2 * (1 - t) * (cy - top) + 2 * t * (top - cy)];
-      branch += `M${x0.toFixed(1)} ${top} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x1.toFixed(1)} ${top} `;
-      const steps = Math.round(sw / 3.2);
-      // a darker, fuller underlayer first, then lighter needles on top
-      for (let pass = 0; pass < 2; pass++) {
-        for (let i = 0; i <= steps; i++) {
-          const t = i / steps, [x, y] = P(t), [dx, dy] = D(t);
-          const a = Math.atan2(dy, dx);
-          for (const side of [-1, 1]) {
-            const ang = a + side * (0.95 + r() * 0.35) + (pass ? 0.15 : -0.1);
-            const len = (pass ? 7 : 10.5) + r() * 3.5;
-            const col = NEEDLES[(pass ? 2 : 0) + Math.floor(r() * 2)];
-            needles += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + Math.cos(ang) * len).toFixed(1)}" y2="${(y + Math.sin(ang) * len).toFixed(1)}" stroke="${col}"/>`;
-          }
+  /* A garland along a chain of swags between anchor points.
+     Returns { svg, swags } so ornaments can be hung from it. */
+  function garland(anchors, sag, r, opts = {}) {
+    const back = { stem: "", needles: "" }, mid = { stem: "", needles: "" }, front = { stem: "", needles: "" };
+    let ribbonBack = "", ribbonFront = "", deco = "";
+    const swags = [];
+    for (let k = 0; k < anchors.length - 1; k++) {
+      const A = anchors[k], B = anchors[k + 1];
+      const C = { x: (A.x + B.x) / 2, y: Math.max(A.y, B.y) + sag * 2 };
+      const P = t => ({ x: (1 - t) * (1 - t) * A.x + 2 * (1 - t) * t * C.x + t * t * B.x,
+                        y: (1 - t) * (1 - t) * A.y + 2 * (1 - t) * t * C.y + t * t * B.y });
+      const D = t => Math.atan2(2 * (1 - t) * (C.y - A.y) + 2 * t * (B.y - C.y), 2 * (1 - t) * (C.x - A.x) + 2 * t * (B.x - C.x));
+      swags.push({ P, D });
+      const len = Math.hypot(B.x - A.x, B.y - A.y) * 1.05;
+      const steps = Math.round(len / 6);
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps, p = P(t), a = D(t);
+        // sprigs point along the garland, alternately a little above and below it
+        sprig(back, p.x, p.y, a + (i % 2 ? -0.55 : 0.55) + (r() - 0.5) * 0.3, 15 + r() * 6, r);
+        sprig(mid, p.x, p.y, a + (i % 2 ? 0.45 : -0.45) + (r() - 0.5) * 0.3, 12 + r() * 5, r);
+        if (i % 2 === 0) sprig(front, p.x, p.y, a + (r() - 0.5) * 0.9, 8 + r() * 4, r);
+      }
+      // a ribbon wound around the garland: the half behind it is drawn under the front needles
+      if (opts.ribbon) {
+        const turns = Math.max(2, Math.round(len / 46));
+        let seg = "", wasFront = null;
+        const flush = isFront => { if (seg) { if (isFront) ribbonFront += seg; else ribbonBack += seg; } seg = ""; };
+        for (let i = 0; i <= 120; i++) {
+          const t = i / 120, p = P(t), a = D(t), ph = t * turns * Math.PI * 2;
+          const off = Math.sin(ph) * 5.5, isFront = Math.cos(ph) > 0;
+          const x = p.x - Math.sin(a) * off, y = p.y + Math.cos(a) * off;
+          if (isFront !== wasFront) { flush(wasFront); seg = `M${f(x)} ${f(y)} `; wasFront = isFront; }
+          else seg += `L${f(x)} ${f(y)} `;
         }
+        flush(wasFront);
       }
-      // ornaments: one at the low point, sometimes a second, shorter one beside it
-      const picks = [[0.5, 10 + r() * 16]];
-      if (sw > 150 && r() > 0.35) picks.push([r() > 0.5 ? 0.27 : 0.73, 4 + r() * 8]);
-      for (const [t, len] of picks) {
-        const [x, y] = P(t);
-        const o = SET[(start + oi++) % SET.length]();
-        hang += `<line x1="${x.toFixed(1)}" y1="${(y + 2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y + len).toFixed(1)}" stroke="${STRING}" stroke-width=".9"/>
-                 <g transform="translate(${x.toFixed(1)} ${(y + len).toFixed(1)}) rotate(${((r() - 0.5) * 10).toFixed(1)}) scale(1.4)">${o}</g>`;
-      }
-      // berries along the swag
-      const bt = 0.22 + r() * 0.2, [bx, by] = P(bt), [ex, ey] = P(1 - bt);
-      deco += berries(bx, by + 2, r) + berries(ex, ey + 2, r);
+      [0.3, 0.7].forEach(t => { const p = P(t + (r() - 0.5) * 0.08); deco += berries(p.x, p.y + 1.5, r, 3 + (r() > 0.5 ? 1 : 0)); });
     }
-    // a bow where the garland is pinned: both ends and between the swags
-    for (let k = 0; k <= swags; k++) deco += bow(inset + k * sw, top + 1);
+    anchors.forEach(p => { deco += bow(p.x, p.y - 1, opts.bowScale || 1); });
 
-    const H = top + sag + 80;
-    let svg = card.querySelector(":scope > .garland-svg");
-    if (!svg) {
-      svg = document.createElementNS(NS, "svg");
-      svg.setAttribute("class", "garland-svg");
-      svg.setAttribute("aria-hidden", "true");
-      card.prepend(svg);
-    }
-    svg.setAttribute("width", W);
-    svg.setAttribute("height", H);
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.innerHTML = `${hang}
-      <path d="${branch}" fill="none" stroke="#5A3A1E" stroke-width="1.6"/>
-      <g stroke-width="1.5" stroke-linecap="round">${needles}</g>
-      ${deco}`;
-    card.dataset.garlandWidth = W;
+    const ribbon = (d, col) => d ? `<path d="${d}" stroke="${INK}" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+      <path d="${d}" stroke="${col}" stroke-width="3" stroke-linecap="round" fill="none"/>` : "";
+    const svg = layer(back, GREEN.back, 1.7) + ribbon(ribbonBack, CRAN_DARK) + layer(mid, GREEN.mid, 1.5)
+      + ribbon(ribbonFront, CRAN) + layer(front, GREEN.front, 1.3) + deco;
+    return { svg, swags };
   }
 
+  /* ---------- hanging ornaments (damped pendulums) ---------- */
+
+  const swingers = [];
+
+  function hang(x, y, kind, length, tilt) {
+    const h = oh(kind);
+    const i = swingers.length;
+    swingers.push({ th: calm ? 0 : tilt, w: 0, L: length + h * 0.6, el: null });
+    return `<g transform="translate(${f(x)} ${f(y)})"><g class="orn" data-i="${i}">
+      <path d="M0 0 V${f(length)}" stroke="${STRING}" stroke-width="1.1"/>
+      <g transform="translate(0 ${f(length)})">${ORN[kind]()}</g>
+      <rect class="orn-hit" x="-15" y="${f(length - 2)}" width="30" height="${f(h + 6)}" fill="transparent"/>
+    </g></g>`;
+  }
+
+  // theta'' = -(g / L) sin(theta) - c theta'
+  let running = false, last = 0;
+  function tick(now) {
+    const dt = Math.min(0.033, (now - last) / 1000 || 0.016);
+    last = now;
+    let moving = false;
+    for (const s of swingers) {
+      if (!s.el || !s.el.isConnected) continue;
+      const acc = -(2600 / s.L) * Math.sin(s.th) - 2.4 * s.w;
+      s.w += acc * dt;
+      s.th += s.w * dt;
+      if (Math.abs(s.th) > 0.002 || Math.abs(s.w) > 0.01) moving = true;
+      else { s.th = 0; s.w = 0; }
+      s.el.setAttribute("transform", `rotate(${(s.th * 180 / Math.PI).toFixed(2)})`);
+    }
+    if (moving) requestAnimationFrame(tick); else running = false;
+  }
+  function kick() {
+    if (calm || running) return;
+    running = true; last = performance.now();
+    requestAnimationFrame(tick);
+  }
+
+  function wire(svg) {
+    svg.querySelectorAll(".orn").forEach(g => {
+      const s = swingers[+g.dataset.i];
+      s.el = g;
+      g.setAttribute("transform", `rotate(${(s.th * 180 / Math.PI).toFixed(2)})`);
+      g.querySelector(".orn-hit").addEventListener("pointerenter", e => {
+        const dir = e.movementX ? Math.sign(e.movementX) : (Math.random() > 0.5 ? 1 : -1);
+        s.w += dir * (2.2 + Math.random());
+        kick();
+      });
+    });
+    kick();
+  }
+
+  function svgEl(cls) {
+    const s = document.createElementNS(NS, "svg");
+    s.setAttribute("class", "garland-svg " + cls);
+    s.setAttribute("aria-hidden", "true");
+    return s;
+  }
+
+  /* ---------- 1. the featured garland: the next-seminar card ---------- */
+
+  function featured(card) {
+    const W = card.clientWidth;
+    if (!W) return;
+    const r = rng(4242);
+    const inset = 18, top = 6;
+    const n = Math.max(2, Math.round((W - inset * 2) / 300));
+    const anchors = Array.from({ length: n + 1 }, (_, k) => ({ x: inset + k * (W - inset * 2) / n, y: top }));
+    const sag = Math.min(22, (W - inset * 2) / n * 0.1);
+    const g = garland(anchors, sag, r, { ribbon: true, bowScale: 1.15 });
+    // a curated arrangement: one main ornament at each low point, a shorter companion beside some
+    const plan = ["cranberry", "star", "copperDrop", "evergreen", "cup", "bell", "finial", "bean", "copperBall", "cone"];
+    let hangs = "", pi = 0;
+    g.swags.forEach((sw, k) => {
+      const p = sw.P(0.5);
+      hangs += hang(p.x, p.y + 3, plan[pi++ % plan.length], 16 + (k % 2) * 12, k % 2 ? 0.12 : -0.12);
+      if (W > 520) {
+        const q = sw.P(k % 2 ? 0.28 : 0.72);
+        hangs += hang(q.x, q.y + 3, plan[pi++ % plan.length], 6 + (k % 3) * 3, k % 2 ? -0.1 : 0.1);
+      }
+    });
+    let svg = card.querySelector(":scope > .garland-featured");
+    if (!svg) { svg = svgEl("garland-featured"); card.prepend(svg); }
+    const H = top + sag + 80;
+    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.innerHTML = hangs + g.svg;
+    card.classList.add("has-featured-garland");
+    card.dataset.garlandW = W;
+    wire(svg);
+  }
+
+  /* ---------- 2. the team page: one garland across each row of cards ---------- */
+
+  const PEOPLE = ["cup", "star", "cranberry", "cone", "bell", "finial", "evergreen", "bean"];
+
+  function teamRows(grid) {
+    const cards = [...grid.querySelectorAll(":scope > .barista")];
+    if (!cards.length) return;
+    const gr = grid.getBoundingClientRect();
+    const rows = [];
+    cards.forEach((c, i) => {
+      const b = c.getBoundingClientRect();
+      const box = { x: b.left - gr.left, y: b.top - gr.top, w: b.width, i };
+      const row = rows.find(rw => Math.abs(rw.y - box.y) < 4);
+      if (row) row.cards.push(box); else rows.push({ y: box.y, cards: [box] });
+    });
+    const r = rng(777);
+    let out = "";
+    rows.forEach(row => {
+      const cs = row.cards.sort((a, b) => a.x - b.x);
+      const anchors = [{ x: cs[0].x + 14, y: row.y + 4 }];
+      cs.forEach((c, k) => {
+        const next = cs[k + 1];
+        anchors.push(next ? { x: (c.x + c.w + next.x) / 2, y: row.y + 1 } : { x: c.x + c.w - 14, y: row.y + 4 });
+      });
+      const g = garland(anchors, 17, r, { ribbon: true });
+      let hangs = "";
+      g.swags.forEach((sw, k) => {
+        // each person's own ornament hangs beside their portrait, alternating sides
+        const idx = cs[k].i, p = sw.P(idx % 2 ? 0.8 : 0.2);
+        hangs += hang(p.x, p.y + 3, PEOPLE[idx % PEOPLE.length], 14 + (idx % 3) * 5, idx % 2 ? -0.14 : 0.14);
+      });
+      out += hangs + g.svg;
+    });
+    let svg = grid.querySelector(":scope > .garland-rows");
+    if (!svg) { svg = svgEl("garland-rows"); grid.appendChild(svg); }
+    svg.setAttribute("width", gr.width); svg.setAttribute("height", gr.height);
+    svg.setAttribute("viewBox", `0 0 ${gr.width} ${gr.height}`);
+    svg.innerHTML = out;
+    grid.dataset.garlandW = gr.width;
+    wire(svg);
+  }
+
+  /* ---------- 3. a single sprig on the corner of the "Give a talk" panel ---------- */
+
+  function cornerSprig(card) {
+    const r = rng(31);
+    const back = { stem: "", needles: "" }, mid = { stem: "", needles: "" }, front = { stem: "", needles: "" };
+    // branches fan out from the corner, along the top edge and down the side
+    const ox = 118, oy = 22;
+    [[3.22, 70], [3.0, 62], [2.78, 54], [2.5, 46], [2.18, 42], [1.9, 50], [1.72, 40]]
+      .forEach(([a, l]) => sprig(back, ox, oy, a + (r() - 0.5) * 0.08, l, r, 1.45));
+    [[3.1, 50], [2.88, 44], [2.6, 36], [2.3, 32], [1.98, 34]]
+      .forEach(([a, l]) => sprig(mid, ox, oy, a + (r() - 0.5) * 0.08, l, r, 1.3));
+    [[2.95, 30], [2.7, 26], [2.4, 22], [2.12, 22]]
+      .forEach(([a, l]) => sprig(front, ox, oy, a, l, r, 1.15));
+    const svg = svgEl("garland-corner");
+    svg.setAttribute("width", 140); svg.setAttribute("height", 110); svg.setAttribute("viewBox", "0 0 140 110");
+    svg.innerHTML = layer(back, GREEN.back, 2) + layer(mid, GREEN.mid, 1.8) + layer(front, GREEN.front, 1.6)
+      + berries(84, 30, r, 5) + berries(104, 50, r, 3) + bow(112, 18, 1.4)
+      + hang(66, 34, "cone", 16, 0.12) + hang(92, 58, "cranberry", 8, -0.1);
+    card.prepend(svg);
+    card.classList.add("has-corner-sprig");
+    wire(svg);
+  }
+
+  /* ---------- placing them, and keeping them in place ---------- */
+
   const ro = new ResizeObserver(entries => entries.forEach(e => {
-    const card = e.target;
-    if (+card.dataset.garlandWidth !== card.clientWidth) draw(card, +card.dataset.garlandIndex);
+    const el = e.target, grid = el.classList.contains("barista-grid");
+    const w = grid ? el.getBoundingClientRect().width : el.clientWidth;
+    if (+el.dataset.garlandW === w) return;
+    if (grid) teamRows(el); else featured(el);
   }));
 
   function scan() {
-    document.querySelectorAll(CARDS).forEach((card, i) => {
-      if (card.dataset.garlandIndex) {
-        // the card's content was replaced (e.g. a seminar card filled in later): draw again
-        if (!card.querySelector(":scope > .garland-svg")) draw(card, +card.dataset.garlandIndex);
-        return;
+    const next = document.querySelector('.event.deck-slide[data-kind="Next seminar"]');
+    if (next && !next.querySelector(":scope > .garland-featured")) {
+      featured(next);
+      if (!next.dataset.garlandObserved) { next.dataset.garlandObserved = "1"; ro.observe(next); }
+    }
+    const grid = document.getElementById("barista-grid");
+    if (grid && grid.querySelector(".barista") && !grid.querySelector(":scope > .garland-rows")) {
+      teamRows(grid);
+      if (!grid.dataset.garlandObserved) {
+        grid.dataset.garlandObserved = "1";
+        ro.observe(grid);
+        // portraits arriving can change the heights, and so the rows' positions
+        grid.addEventListener("load", () => teamRows(grid), true);
       }
-      card.dataset.garlandIndex = i;
-      card.classList.add("has-garland");
-      draw(card, i);
-      ro.observe(card);
-    });
+    }
+    const talk = document.querySelector(".talk-panel");
+    if (talk && !talk.querySelector(":scope > .garland-corner")) cornerSprig(talk);
   }
 
   function start() {
     scan();
-    new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(muts => {
+      if (muts.every(m => m.target.closest && m.target.closest(".garland-svg"))) return;   // our own drawing
+      scan();
+    }).observe(document.body, { childList: true, subtree: true });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
