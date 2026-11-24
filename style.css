@@ -2517,6 +2517,7 @@ footer a {
 /* lights: a string along the bottom of the header, half the bulbs glowing at a time */
 .xmas-lights .site-header .header-bar {
   position: relative;
+  border-bottom-color: transparent;  /* the wire takes the place of the bottom line */
 }
 
 .xmas-lights .site-header.is-floating .header-bar {
@@ -2529,10 +2530,10 @@ footer a {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% - 2.5px);           /* the wire's hooks sit on the header's bottom line */
+  top: calc(100% - 2px);             /* the wire's hooks sit exactly where the bottom line was */
   height: 26px;
-  background-repeat: repeat-x;
-  background-position: center top;
+  background-repeat: round no-repeat;  /* a whole number of swags: no cut bulb at either end */
+  background-position: left top;
   pointer-events: none;
 }
 
@@ -2551,144 +2552,56 @@ footer a {
   50%      { opacity: 0.55; }
 }
 
-/* hat: a Santa hat riding on the dark header pill */
-.xmas-hat .nav-pill::after {
+/* hat: a Santa hat worn by the dark header pill, its fur brim resting along the pill's top edge.
+   On pages without a pill (the privacy notice) it sits on the outer bar instead. */
+.xmas-hat .nav-pill::after,
+.xmas-hat nav .links:has(.nav-pill.is-off)::after {
   content: "";
   position: absolute;
-  top: -19px;                        /* the fur brim rests on the pill's top-left corner */
-  left: 2px;
-  width: 42px;
-  height: 36px;
+  top: -22px;
+  left: 10px;
+  width: 44px;
+  height: 38px;
   background: url("../img/xmas/hat.webp") center / contain no-repeat;
-  transform: rotate(18deg);
+  transform: rotate(30deg) translateY(3px);
   pointer-events: none;
 }
 
-/* in the slim bar that follows the page there is less room above the pill */
-.xmas-hat .site-header.is-floating .nav-pill::after {
-  top: -12px;
-  left: 4px;
-  width: 32px;
-  height: 27px;
+.xmas-hat nav .links:has(.nav-pill.is-off)::after {
+  top: -24px;
+  left: 14px;
+  z-index: 2;
 }
 
 .xmas-hat .nav-pill.is-off::after {
   display: none;
 }
 
-/* ornaments: a different decoration on each card, all cut from the Christmas logo */
-.xmas-holly .barista,
-.xmas-holly .talk-panel,
-.xmas-holly .event {
+/* the slim bar that follows the page: a little more room above the pill for the hat */
+.xmas-hat .site-header.is-floating .header-bar {
+  padding-top: 18px;
+}
+
+/* garland: drawn by js/garland.js along the top edge of each card */
+.has-garland:not(.policy-toc) {
   position: relative;
 }
 
-.xmas-holly .barista::after,
-.xmas-holly .talk-panel::after,
-.xmas-holly .event::after,
-.xmas-holly .policy-toc::after {
-  content: "";
+.garland-svg {
   position: absolute;
-  background-repeat: no-repeat;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  overflow: visible;
   pointer-events: none;
 }
 
-/* holly sprig over the top-right corner */
-.xmas-holly .barista:nth-child(5n+1)::after,
-.xmas-holly .event.deck-slide:nth-child(3n+1)::after,
-.xmas-holly .policy-toc::after {
-  top: -14px;
-  right: -12px;
-  width: 64px;
-  height: 50px;
-  background-image: url("../img/xmas/holly.webp");
-  background-size: contain;
-  transform: rotate(8deg);
-}
-
-/* fir boughs tied with a bow, centred on the top edge */
-.xmas-holly .barista:nth-child(5n+2)::after,
-.xmas-holly .talk-panel::after {
-  top: -24px;
-  left: 50%;
-  width: 150px;
-  height: 62px;
-  background-image: url("../img/xmas/bough.webp");
-  background-size: contain;
-  background-position: center;
-  transform: translateX(-50%);
-}
-
-/* two baubles hanging from the top edge, on strings of different lengths */
-.xmas-holly .barista:nth-child(5n+3)::after {
-  top: 0;
-  left: 26px;
-  width: 64px;
-  height: 100px;
-  background-image:
-    url("../img/xmas/redbauble.webp"),
-    url("../img/xmas/handlebauble.webp"),
-    linear-gradient(#8B5E34, #8B5E34),
-    linear-gradient(#8B5E34, #8B5E34);
-  background-size: 30px auto, 28px auto, 1.5px 32px, 1.5px 54px;
-  background-position: 0 30px, 34px 52px, 14.5px 0, 47.5px 0;
-}
-
-/* a fir sprig and a pine cone over the top-left corner */
-.xmas-holly .barista:nth-child(5n+4)::after,
-.xmas-holly .event.deck-slide:nth-child(3n+2)::after {
-  top: -18px;
-  left: -16px;
-  width: 96px;
-  height: 90px;
-  background-image: url("../img/xmas/cone.webp"), url("../img/xmas/firpacket.webp");
-  background-size: 44px auto, 88px auto;
-  background-position: 38px 44px, 0 0;
-}
-
-/* two gold stars hanging on strings by the top-right corner */
-.xmas-holly .barista:nth-child(5n)::after,
-.xmas-holly .event.deck-slide:nth-child(3n)::after {
-  top: 0;
-  right: 22px;
-  width: 60px;
-  height: 92px;
-  background-image:
-    url("../img/xmas/hangstar.webp"),
-    url("../img/xmas/hangstar.webp"),
-    linear-gradient(#8B5E34, #8B5E34),
-    linear-gradient(#8B5E34, #8B5E34);
-  background-size: 28px auto, 24px auto, 1.5px 34px, 1.5px 56px;
-  background-position: 0 30px, 32px 52px, 13.25px 0, 43.25px 0;
-}
-
-/* seminar cards: the row they slide in clips anything outside them, so they stay inside */
-.xmas-holly .event.deck-slide:nth-child(3n+1)::after {
-  top: 10px;
-  right: 10px;
-  width: 56px;
-  height: 44px;
-}
-
-.xmas-holly .event.deck-slide:nth-child(3n+2)::after {
-  top: 0;
-  left: auto;
-  right: 0;
-  transform: scaleX(-1);
-  border-top-right-radius: 12px;
-}
-
-.xmas-holly .event > h3:first-of-type {
-  padding-right: 80px;               /* room for the ornament */
-}
-
-/* privacy contents: the list scrolls inside itself, so the holly sits inside its corner */
-.xmas-holly .policy-toc::after {
-  top: 8px;
-  right: 8px;
-  width: 48px;
-  height: 38px;
-}
+/* a little more room at the top, so the ornaments hang clear of the content */
+.xmas-garland .barista { padding-top: 54px; }
+.xmas-garland .event { padding-top: 70px; }
+.xmas-garland .talk-panel { padding-top: 76px; }
+.xmas-garland .policy-toc { padding-top: 64px; }
+.xmas-garland .counter-card { padding-top: 64px; }
 
 /* globe: snow falling inside the round "Brewing..." illustration (drawn by js/season.js) */
 .xmas-globe-snow {

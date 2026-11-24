@@ -11,13 +11,14 @@
      logo    Christmas logo in the header and browser tab
      footer  festive line in the footer credit
      globe   snow falling inside the round "Brewing..." illustration
-     holly   an ornament on each card (holly, bow, baubles, fir and cone, stars), varied card to card
+     garland an evergreen garland along the top of each card, with different ornaments
+             hanging from it card to card (drawn by js/garland.js)
      hat     a Santa hat riding on the header pill
      lights  a string of lights along the bottom of the header */
 (function () {
   const START = { month: 11, day: 24 };     // 24 November
   const END = { month: 1, day: 10 };        // 10 January (inclusive)
-  const FEATURES = ["logo", "footer", "globe", "holly", "hat", "lights"];
+  const FEATURES = ["logo", "footer", "globe", "garland", "hat", "lights"];
   // Master switch. false: hidden from visitors, shown only with ?xmas=on (preview).
   // true: on by date, START to END.
   const LIVE = false;
