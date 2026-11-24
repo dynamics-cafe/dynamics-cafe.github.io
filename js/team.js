@@ -26,7 +26,7 @@
     });
   });
 
-  fetch("data/organizers.json?v=20261124a")
+  fetch("data/organizers.json?v=20261124b")
     .then(r => r.json())
     .then(list => {
       if (faces) {
