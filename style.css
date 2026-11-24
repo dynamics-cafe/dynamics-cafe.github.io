@@ -2508,3 +2508,152 @@ footer a {
     transition: none;
   }
 }
+
+
+/* ==================================================
+   Christmas (js/season.js switches these on by date: 24 November - 10 January)
+   ================================================== */
+
+/* lights: a string along the bottom of the header, half the bulbs glowing at a time */
+.xmas-lights .site-header .header-bar {
+  position: relative;
+}
+
+.xmas-lights .site-header.is-floating .header-bar {
+  position: fixed;
+}
+
+.xmas-lights .header-bar::before,
+.xmas-lights .header-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -16px;
+  height: 26px;
+  background-repeat: repeat-x;
+  background-position: center top;
+  pointer-events: none;
+}
+
+.xmas-lights .header-bar::before {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cellipse%20cx%3D%2290%22%20cy%3D%2216%22%20rx%3D%226.5%22%20ry%3D%228.2%22%20fill%3D%22%23E7A92B%22%20opacity%3D%22.22%22/%3E%3Cellipse%20cx%3D%22210%22%20cy%3D%2216%22%20rx%3D%226.5%22%20ry%3D%228.2%22%20fill%3D%22%233D7FC4%22%20opacity%3D%22.22%22/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cpath%20d%3D%22M0%203%20Q30%2013%2060%203%20T120%203%20T180%203%20T240%203%22%20fill%3D%22none%22%20stroke%3D%22%234E2A14%22%20stroke-width%3D%221.4%22/%3E%3Crect%20x%3D%2227.6%22%20y%3D%227%22%20width%3D%224.8%22%20height%3D%224.2%22%20rx%3D%221%22%20fill%3D%22%235a3a1c%22/%3E%3Cellipse%20cx%3D%2230%22%20cy%3D%2216%22%20rx%3D%224.2%22%20ry%3D%226%22%20fill%3D%22%23D7322B%22/%3E%3Cellipse%20cx%3D%2228.6%22%20cy%3D%2214%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%2287.6%22%20y%3D%227%22%20width%3D%224.8%22%20height%3D%224.2%22%20rx%3D%221%22%20fill%3D%22%235a3a1c%22/%3E%3Cellipse%20cx%3D%2290%22%20cy%3D%2216%22%20rx%3D%224.2%22%20ry%3D%226%22%20fill%3D%22%23E7A92B%22/%3E%3Cellipse%20cx%3D%2288.6%22%20cy%3D%2214%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22147.6%22%20y%3D%227%22%20width%3D%224.8%22%20height%3D%224.2%22%20rx%3D%221%22%20fill%3D%22%235a3a1c%22/%3E%3Cellipse%20cx%3D%22150%22%20cy%3D%2216%22%20rx%3D%224.2%22%20ry%3D%226%22%20fill%3D%22%232F8A46%22/%3E%3Cellipse%20cx%3D%22148.6%22%20cy%3D%2214%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22207.6%22%20y%3D%227%22%20width%3D%224.8%22%20height%3D%224.2%22%20rx%3D%221%22%20fill%3D%22%235a3a1c%22/%3E%3Cellipse%20cx%3D%22210%22%20cy%3D%2216%22%20rx%3D%224.2%22%20ry%3D%226%22%20fill%3D%22%233D7FC4%22/%3E%3Cellipse%20cx%3D%22208.6%22%20cy%3D%2214%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3C/svg%3E");
+  animation: xmas-twinkle 2.6s ease-in-out infinite;
+}
+
+.xmas-lights .header-bar::after {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cellipse%20cx%3D%2230%22%20cy%3D%2216%22%20rx%3D%226.5%22%20ry%3D%228.2%22%20fill%3D%22%23D7322B%22%20opacity%3D%22.22%22/%3E%3Cellipse%20cx%3D%22150%22%20cy%3D%2216%22%20rx%3D%226.5%22%20ry%3D%228.2%22%20fill%3D%22%232F8A46%22%20opacity%3D%22.22%22/%3E%3C/svg%3E");
+  animation: xmas-twinkle 2.6s ease-in-out -1.3s infinite;
+}
+
+@keyframes xmas-twinkle {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* hat: a Santa hat riding on the dark header pill */
+.xmas-hat .nav-pill::after {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: -10px;
+  width: 34px;
+  height: 29px;
+  background: url("../img/xmas/hat.webp") center / contain no-repeat;
+  transform: rotate(-14deg);
+  pointer-events: none;
+}
+
+.xmas-hat .nav-pill.is-off::after {
+  display: none;
+}
+
+/* holly: a sprig on the corner of the cards */
+.xmas-holly .barista,
+.xmas-holly .talk-panel,
+.xmas-holly .event,
+.xmas-holly .policy-toc {
+  position: relative;
+}
+
+.xmas-holly .barista::after,
+.xmas-holly .talk-panel::after,
+.xmas-holly .event::after,
+.xmas-holly .policy-toc::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  right: -12px;
+  width: 64px;
+  height: 50px;
+  background: url("../img/xmas/holly.webp") center / contain no-repeat;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.xmas-holly .policy-toc {
+  overflow: visible;
+}
+
+.xmas-holly .event::after {
+  top: 10px;
+  right: 10px;
+  width: 56px;
+  height: 44px;
+}
+
+/* globe: snow falling inside the round "Brewing..." illustration (drawn by js/season.js) */
+.xmas-globe-snow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* snow: a few flakes drifting down the background (js/season.js), behind the content */
+.xmas-snow-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.xmas-snow-layer i {
+  position: absolute;
+  top: -12px;
+  animation: xmas-fall linear infinite;
+  will-change: transform;
+}
+
+.xmas-snow-layer b {
+  display: block;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 2px rgba(110, 70, 40, 0.4);
+  animation: xmas-sway ease-in-out infinite alternate;
+}
+
+@keyframes xmas-fall {
+  to { transform: translateY(calc(100lvh + 24px)); }
+}
+
+@keyframes xmas-sway {
+  from { transform: translateX(-10px); }
+  to   { transform: translateX(10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmas-lights .header-bar::before,
+  .xmas-lights .header-bar::after {
+    animation: none;
+  }
+}
+
+.xmas-holly .event > h3:first-of-type,
+.xmas-holly .event .event-title {
+  padding-right: 52px;               /* room for the holly in the corner */
+}

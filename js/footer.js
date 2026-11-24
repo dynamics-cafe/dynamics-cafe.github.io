@@ -8,6 +8,8 @@
 (function () {
   const footer = document.getElementById("site-footer");
   if (!footer) return;
+  // Christmas line (js/season.js), when in season
+  const festive = !!(window.DynamicsCafeSeason && window.DynamicsCafeSeason.has("footer"));
   footer.innerHTML = `
     <div class="container footer-content">
       <p>
@@ -20,6 +22,8 @@
       </p>
     </div>
     <p class="container footer-credit">
-      Human taste, Claude&rsquo;s code, a lot of coffee ☕
+      ${festive
+        ? "Human taste, Claude&rsquo;s code, a lot of coffee and the odd hot chocolate ☕"
+        : "Human taste, Claude&rsquo;s code, a lot of coffee ☕"}
     </p>`;
 })();

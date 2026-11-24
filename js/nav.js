@@ -24,6 +24,9 @@
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const phone = () => window.matchMedia("(max-width: 650px)").matches;
 
+  // Christmas decorations (js/season.js), when in season
+  const xmas = f => !!(window.DynamicsCafeSeason && window.DynamicsCafeSeason.has(f));
+
   const LINKS = [
     { key: "seminars", label: "Seminars",    href: home ? "#seminars" : "./" },
     { key: "talk",     label: "Give a talk", href: home ? "#contact" : "./#contact" },
@@ -35,7 +38,7 @@
       <div class="container">
         <nav aria-label="Main">
           <a class="logo" href="./">
-            <img src="img/logo-512.webp" alt="" class="nav-logo" width="512" height="501">
+            <img src="${xmas("logo") ? "img/xmas/logo-512.webp" : "img/logo-512.webp"}" alt="" class="nav-logo" width="512" height="501">
             <span>Dynamics Cafe<small>Seminar Group</small></span>
           </a>
           <div class="nav-right">
