@@ -160,6 +160,7 @@
     if (!floating && y > fullHeight + 30) {
       floating = true;
       header.classList.add("is-floating");
+      document.documentElement.style.setProperty("--bar-height", bar.offsetHeight + "px");
       place(active);
     } else if (floating && y < fullHeight) {
       floating = false;
@@ -209,6 +210,9 @@
       else { scrolling = false; onDone(); }
     })(t0);
   }
+
+  // shared with other scripts (e.g. the contents list of the privacy notice)
+  window.DynamicsCafe = Object.assign(window.DynamicsCafe || {}, { glideTo, isGliding: () => scrolling });
 
   // The home page: the pill follows the section you are reading
   const inPage = items.filter(a => a.getAttribute("href").startsWith("#"));

@@ -141,6 +141,7 @@ a {
 
 /* phones, while scrolling down */
 .site-header.is-floating.is-hidden .header-bar {
+  animation: none;                     /* the slide-in animation would otherwise hold it in place */
   transform: translateY(-110%);
 }
 
@@ -2366,5 +2367,144 @@ footer a {
 
   .policy-section p {
     font-size: 0.98rem;
+  }
+}
+
+/* contents list: a pill glides to the section being read (js/policy.js) */
+.policy-toc ol {
+  position: relative;
+}
+
+.policy-toc-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-radius: 10px;
+  background: #FFF6E6;
+  box-shadow: 0 2px 8px rgba(72, 24, 8, 0.08), inset 3px 0 0 var(--copper);
+  pointer-events: none;
+}
+
+.policy-toc ol.is-ready .policy-toc-pill {
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1), height 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.policy-toc li {
+  position: relative;
+  z-index: 1;
+}
+
+.policy-toc a.is-on {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.policy-toc a.is-on:hover {
+  background: transparent;
+}
+
+/* small screens: a slim bar with the current section, under the header */
+.policy-strip {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  /* the pill would be out of view at the top: the bar does its job instead */
+  .policy-toc-pill {
+    display: none;
+  }
+
+  .policy-strip {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 50px;
+    margin-bottom: -50px;            /* takes no room in the page */
+    padding: 0 16px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: #FBE8C6;
+    box-shadow: 0 6px 16px rgba(72, 24, 8, 0.06);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.92rem;
+    text-align: left;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, top 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .policy-strip.is-shown {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* sits under the header bar while that is showing */
+  .site-header.is-floating:not(.is-hidden) ~ main .policy-strip {
+    top: var(--bar-height, 60px);
+  }
+
+  .policy-strip-num {
+    flex: none;
+    color: var(--copper);
+    font-weight: 700;
+  }
+
+  .policy-strip-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .policy-strip-up {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    color: var(--text);
+    font-size: 0.8rem;
+  }
+
+  .policy-strip-up svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .policy-strip-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+  }
+
+  .policy-strip-progress span {
+    display: block;
+    height: 100%;
+    background: var(--copper);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.15s linear;
+  }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .policy-strip {
+    transition: none;
   }
 }
