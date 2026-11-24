@@ -5,20 +5,19 @@
    To preview or test, add to any page address (it then stays on in that tab while you browse):
      ?xmas=on         all decorations, whatever the date
      ?xmas=off        none, whatever the date (also ends a preview)
-     ?xmas=hat,snow   only the ones listed
+     ?xmas=hat,globe  only the ones listed
 
    Decorations (each is a class on <html>, styled in style.css under "Christmas"):
      logo    Christmas logo in the header and browser tab
      footer  festive line in the footer credit
      globe   snow falling inside the round "Brewing..." illustration
-     holly   holly sprigs on the corners of the cards
+     holly   an ornament on each card (holly, bow, baubles, fir and cone, stars), varied card to card
      hat     a Santa hat riding on the header pill
-     lights  a string of lights along the bottom of the header
-     snow    a few snowflakes drifting down the background */
+     lights  a string of lights along the bottom of the header */
 (function () {
   const START = { month: 11, day: 24 };     // 24 November
   const END = { month: 1, day: 10 };        // 10 January (inclusive)
-  const FEATURES = ["logo", "footer", "globe", "holly", "hat", "lights", "snow"];
+  const FEATURES = ["logo", "footer", "globe", "holly", "hat", "lights"];
   // Master switch. false: hidden from visitors, shown only with ?xmas=on (preview).
   // true: on by date, START to END.
   const LIVE = false;
@@ -117,25 +116,4 @@
     });
   }
 
-  // a few snowflakes drifting down the background: small elements moved by the browser itself
-  // (a full-screen canvas for them cost a quarter of the frame rate on slow computers)
-  if (on.includes("snow") && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    document.addEventListener("DOMContentLoaded", () => {
-      const layer = document.createElement("div");
-      layer.className = "xmas-snow-layer";
-      layer.setAttribute("aria-hidden", "true");
-      const n = window.innerWidth < 650 ? 18 : 34;
-      let html = "";
-      for (let i = 0; i < n; i++) {
-        const size = (3 + Math.random() * 5).toFixed(1);
-        const fall = (16 + Math.random() * 18).toFixed(1);
-        const sway = (3 + Math.random() * 4).toFixed(1);
-        html += `<i style="left:${(Math.random() * 100).toFixed(2)}%;--s:${size}px;` +
-          `animation-duration:${fall}s;animation-delay:-${(Math.random() * fall).toFixed(1)}s">` +
-          `<b style="animation-duration:${sway}s;animation-delay:-${(Math.random() * sway).toFixed(1)}s"></b></i>`;
-      }
-      layer.innerHTML = html;
-      document.body.prepend(layer);
-    });
-  }
 })();
