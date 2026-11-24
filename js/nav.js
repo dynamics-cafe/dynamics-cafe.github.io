@@ -56,14 +56,17 @@
   const links = header.querySelector(".links");
   const pill = header.querySelector(".nav-pill");
   const items = [...links.querySelectorAll("a")];
-  let active = items.find(a => a.dataset.key === page) || items[0];
+  // pages without their own link (e.g. the privacy notice) have no pill
+  let active = items.find(a => a.dataset.key === page) || null;
 
   /* ---------- the sliding pill ---------- */
 
   function place(a) {
+    pill.classList.toggle("is-off", !a);
+    items.forEach(i => i.classList.toggle("is-on", i === a));
+    if (!a) return;
     pill.style.width = a.offsetWidth + "px";
     pill.style.transform = `translateX(${a.offsetLeft}px)`;
-    items.forEach(i => i.classList.toggle("is-on", i === a));
   }
 
   function set(a) {
@@ -84,9 +87,15 @@
 
   if (arriving) {
     document.documentElement.classList.add("is-arriving");
-    pill.style.width = from.width + "px";
-    pill.style.transform = `translateX(${from.left}px)`;
-    items.forEach(i => i.classList.toggle("is-on", i === items[from.index]));
+    if (from.index < 0) {
+      // coming from a page without a pill: it fades in where it belongs
+      place(active);
+      pill.classList.add("is-off");
+    } else {
+      pill.style.width = from.width + "px";
+      pill.style.transform = `translateX(${from.left}px)`;
+      items.forEach(i => i.classList.toggle("is-on", i === items[from.index]));
+    }
   } else {
     place(active);
   }
@@ -106,26 +115,30 @@
     return path(a.pathname) === path(location.pathname);
   }
 
-  items.forEach(a => a.addEventListener("click", e => {
+  // any link to another page of the site (header, footer, cards)
+  document.addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (!a || e.defaultPrevented) return;
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-    if (samePage(a)) return;                 // handled below (gentle scroll)
+    if (a.origin !== location.origin || a.target || a.hasAttribute("download")) return;
+    if (samePage(a)) return;                 // links within the page: gentle scroll, below
     if (calm) return;
     e.preventDefault();
     // the content fades out; the next page then slides the pill over in one movement
     try {
-      sessionStorage.setItem("navFrom", JSON.stringify({
-        left: active.offsetLeft, width: active.offsetWidth, index: items.indexOf(active), t: Date.now()
-      }));
+      sessionStorage.setItem("navFrom", JSON.stringify(active
+        ? { left: active.offsetLeft, width: active.offsetWidth, index: items.indexOf(active), t: Date.now() }
+        : { index: -1, t: Date.now() }));
     } catch (err) { /* fine: no glide */ }
     document.documentElement.classList.add("is-leaving");
     setTimeout(() => { location.href = a.href; }, 300);
-  }));
+  });
 
   // Coming back with the browser's Back button can restore the faded-out page: undo the fade
   window.addEventListener("pageshow", e => {
     if (e.persisted) {
       document.documentElement.classList.remove("is-leaving");
-      active = items.find(a => a.dataset.key === page) || items[0];
+      active = items.find(a => a.dataset.key === page) || null;
       place(active);
     }
   });

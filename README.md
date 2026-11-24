@@ -48,6 +48,19 @@ after `<body>`:
 <script src="js/nav.js" data-page="seminars"></script>
 ```
 
+The footer (Google Calendar, LinkedIn, Privacy) works the same way, from `js/footer.js`:
+
+```html
+<footer class="site-footer" id="site-footer"></footer>
+<script src="js/footer.js"></script>
+```
+
+## Privacy notice
+
+`privacy.html` holds the organisers' privacy notice, linked from the footer of every page. To revise it,
+edit the text there (each numbered section is a `<section class="policy-section">`), update the
+"Revised on" date under the title, and keep the Contents list in step with the section headings.
+
 ## About this website
 
 This website was built by the Dynamics Cafe organisers with the help of an AI coding assistant
