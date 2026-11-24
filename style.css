@@ -25,31 +25,41 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Moving between pages: a soft cross-fade, and the header pill glides to its new place
-   (browsers without view transitions simply load the page as before) */
-@view-transition {
-  navigation: auto;
+/* Links within the page land below the header that stays at the top */
+html {
+  scroll-padding-top: 84px;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.45s;
-  animation-timing-function: ease;
+/* Moving between pages (js/nav.js): the content fades out, the next page fades in,
+   and the header stays put while its pill glides on */
+html.is-leaving main,
+html.is-leaving footer {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-::view-transition-group(nav-pill) {
-  animation-duration: 0.55s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+html.is-arriving main,
+html.is-arriving footer {
+  animation: page-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  @view-transition {
-    navigation: none;
+  html.is-arriving main,
+  html.is-arriving footer {
+    animation: none;
   }
 
   nav .links.is-ready .nav-pill,
-  nav .links a {
-    transition: none;
+  nav .links a,
+  .site-header .header-bar {
+    transition: none !important;
+    animation: none !important;
   }
 }
 
@@ -92,10 +102,51 @@ a {
    Header
    ================================================== */
 
-header {
+.site-header {
+  position: relative;
+  z-index: 50;
+}
+
+.site-header .header-bar {
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
   background: rgba(255, 241, 214, 0.93);
+}
+
+/* after scrolling past it: a slim bar at the top of the window */
+.site-header.is-floating .header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 0;
+  background: rgba(255, 241, 214, 0.97);
+  box-shadow: 0 6px 20px rgba(72, 24, 8, 0.07);
+  animation: bar-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header.is-floating .nav-logo {
+  width: 50px;
+}
+
+.site-header.is-floating .logo {
+  gap: 12px;
+  font-size: 1.1rem;
+}
+
+.site-header.is-floating .logo small {
+  display: none;
+}
+
+/* phones, while scrolling down */
+.site-header.is-floating.is-hidden .header-bar {
+  transform: translateY(-110%);
+}
+
+@keyframes bar-in {
+  from { transform: translateY(-100%); }
+  to   { transform: none; }
 }
 
 nav {
@@ -167,7 +218,7 @@ nav .links a {
   font-size: 0.95rem;
   white-space: nowrap;
   text-decoration: none;
-  transition: color 0.45s ease;
+  transition: color 0.5s ease;
 }
 
 nav .links a:hover {
@@ -187,11 +238,10 @@ nav .links:not(.has-pill) a[aria-current="page"] {
   left: 0;
   border-radius: 999px;
   background: var(--ink);
-  view-transition-name: nav-pill;
 }
 
 nav .links.is-ready .nav-pill {
-  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1), width 0.85s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 nav .links a.is-on,
@@ -1608,7 +1658,7 @@ footer a {
 
 @media (max-width: 650px) {
 
-  header,
+  .site-header .header-bar,
   footer {
     background: rgba(255, 241, 214, 0.94);
   }
@@ -1630,8 +1680,21 @@ footer a {
   }
 
   /* header: small logo, name on one line, links on one row */
-  header {
+  .site-header .header-bar {
     padding: 10px 0;
+  }
+
+  html {
+    scroll-padding-top: 72px;
+  }
+
+  /* the bar at the top of the window: just the links */
+  .site-header.is-floating .header-bar {
+    padding: 8px 0;
+  }
+
+  .site-header.is-floating .logo {
+    display: none;
   }
 
   nav {

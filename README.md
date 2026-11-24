@@ -37,6 +37,17 @@ Any shape works (landscape, square, portrait): it is cropped to a portrait
 frame around `photo_focus`, and the frame never shows empty edges. Use JPG, PNG or WebP at about 800-1200 px on
 the long side. iPhone HEIC files are not supported by browsers: export them as JPG first.
 
+## Header
+
+The header (logo, Seminars / Give a talk / Baristas, LinkedIn) is written by `js/nav.js` for every
+page, so it is always the same everywhere: to change it, edit only that file. A new page needs, right
+after `<body>`:
+
+```html
+<header class="site-header" id="site-header"></header>
+<script src="js/nav.js" data-page="seminars"></script>
+```
+
 ## About this website
 
 This website was built by the Dynamics Cafe organisers with the help of an AI coding assistant

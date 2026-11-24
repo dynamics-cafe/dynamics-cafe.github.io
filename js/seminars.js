@@ -540,7 +540,8 @@ loadSeminars();
   const place = () => {
     const el = document.getElementById(id);
     if (stop || !el) return;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: "instant" });
+    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;   // the header at the top
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - pad, behavior: "instant" });
   };
   const ro = new ResizeObserver(place);
   ro.observe(document.body);
