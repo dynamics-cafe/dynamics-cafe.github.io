@@ -6,7 +6,7 @@
     "duration_minutes": 60,
     "title": "Noise-induced Excitability and Pulse Dynamics in Autotoxic Populations",
     "speaker": "Pablo Moreno-Spiegelberg",
-    "photo": "img/speakers/pablo-moreno-spiegelberg.webp",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/pablo-moreno-spiegelberg.webp",
     "photo_focus": "29% 31%",
     "photo_zoom": 1.9,
     "speaker_links": [
@@ -39,7 +39,7 @@
     "duration_minutes": 60,
     "title": "Dynamical approximation for Wasserstein gradient flows",
     "speaker": "Isabella Carla Gonnella",
-    "photo": "img/speakers/isabella-carla-gonnella.webp",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/isabella-carla-gonnella.webp",
     "photo_focus": "35% 21%",
     "photo_zoom": 1.25,
     "speaker_links": [
@@ -72,7 +72,7 @@
     "duration_minutes": 60,
     "title": "From Gradient Descent to Damped Mechanics: A Dynamical-Systems View of Optimization",
     "speaker": "Viktor Stein",
-    "photo": "img/speakers/viktor-stein.webp",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/viktor-stein.webp",
     "photo_focus": "50% 33%",
     "photo_zoom": 1.35,
     "speaker_links": [

@@ -15,13 +15,25 @@ Edit `data/seminars.json`. The page opens on the next upcoming seminar automatic
 | `speaker_links` | Optional list of `{ "label": "Google Scholar", "url": "..." }`, one chip per link. |
 | `abstract` | Optional. A blank line starts a new paragraph. |
 | `meeting_url` | The Google Meet link (only shown on the website). |
-| `photo` | Optional path such as `img/speakers/first-last.jpg`. Leave it out if the speaker prefers no photo. |
+| `photo` | Optional link to the photo in the `speaker-photos` release (see below). Leave it out if the speaker prefers no photo. |
 | `photo_focus` | Optional. Where the face is in the photo, as percentages from the top-left, e.g. `"29% 31%"`. |
 | `photo_zoom` | Optional. `1` fills the frame, `1.5` zooms in around the face. |
 
 ### Speaker photos
 
-Put the image in `img/speakers/`. Any shape works (landscape, square, portrait): it is cropped to a portrait
+**Never commit speaker photos to the repository.** Anything committed stays in the git history, so a
+speaker who later asks to be removed could only be erased by rewriting history. Photos live in the
+GitHub release called `speaker-photos` instead, which is not part of the history:
+
+1. On GitHub, open Releases, then the `speaker-photos` release, then Edit.
+2. Drag the photo in (name it `first-last.webp` or `.jpg`) and click Update release.
+3. In `data/seminars.json`, set `photo` to
+   `https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/first-last.webp`.
+
+To remove a photo, delete its file from the release and remove the `photo` line. If the file is missing,
+the card simply shows no portrait.
+
+Any shape works (landscape, square, portrait): it is cropped to a portrait
 frame around `photo_focus`, and the frame never shows empty edges. Use JPG, PNG or WebP at about 800-1200 px on
 the long side. iPhone HEIC files are not supported by browsers: export them as JPG first.
 
