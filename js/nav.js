@@ -44,6 +44,7 @@
           <div class="nav-right">
             <div class="links has-pill">
               <span class="nav-pill" aria-hidden="true"></span>
+              <span class="nav-hat" aria-hidden="true"><i></i></span>
               ${LINKS.map(l => `<a href="${l.href}" data-key="${l.key}"${l.key === page ? ' aria-current="page"' : ""}>${l.label}</a>`).join("")}
             </div>
             <a class="nav-icon" href="https://www.linkedin.com/company/dynamics-cafe/" target="_blank" rel="noopener noreferrer"
@@ -58,6 +59,10 @@
   const bar = header.querySelector(".header-bar");
   const links = header.querySelector(".links");
   const pill = header.querySelector(".nav-pill");
+  // the Christmas hat (js/season.js) is its own element: it rides on the pill and glides with it,
+  // and on pages without a pill it rests on the outer bar, at the same height (no jump)
+  const hat = header.querySelector(".nav-hat");
+  const hatAt = x => { hat.style.transform = `translateX(${x}px)`; };
   const items = [...links.querySelectorAll("a")];
   // pages without their own link (e.g. the privacy notice) have no pill
   let active = items.find(a => a.dataset.key === page) || null;
@@ -67,6 +72,7 @@
   function place(a) {
     pill.classList.toggle("is-off", !a);
     items.forEach(i => i.classList.toggle("is-on", i === a));
+    hatAt(a ? a.offsetLeft : 0);
     if (!a) return;
     pill.style.width = a.offsetWidth + "px";
     pill.style.transform = `translateX(${a.offsetLeft}px)`;
@@ -94,10 +100,13 @@
       // coming from a page without a pill: it fades in where it belongs
       place(active);
       pill.classList.add("is-off");
+      hatAt(0);                               // the hat starts where it rested on the outer bar
     } else {
       pill.style.width = from.width + "px";
       pill.style.transform = `translateX(${from.left}px)`;
       items.forEach(i => i.classList.toggle("is-on", i === items[from.index]));
+      hatAt(from.left);
+      if (!active) pill.classList.remove("is-off");   // fades out from where it was
     }
   } else {
     place(active);

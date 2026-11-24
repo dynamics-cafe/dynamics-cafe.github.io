@@ -56,6 +56,7 @@ html.is-arriving footer {
   }
 
   nav .links.is-ready .nav-pill,
+  nav .links.is-ready .nav-hat,
   nav .links a,
   .site-header .header-bar {
     transition: none !important;
@@ -2553,28 +2554,33 @@ footer a {
 }
 
 /* hat: a Santa hat worn by the dark header pill, its fur brim resting along the pill's top edge.
-   On pages without a pill (the privacy notice) it sits on the outer bar instead. */
-.xmas-hat .nav-pill::after,
-.xmas-hat nav .links:has(.nav-pill.is-off)::after {
-  content: "";
+   It is its own element (js/nav.js), gliding with the pill; on pages without a pill (the privacy
+   notice) it rests on the outer bar at the same height, so it never jumps. */
+.nav-hat {
+  display: none;
+}
+
+.xmas-hat .nav-hat {
+  display: block;
   position: absolute;
-  top: -22px;
+  top: -18px;
   left: 10px;
+  z-index: 2;
   width: 44px;
   height: 38px;
-  background: url("../img/xmas/hat.webp") center / contain no-repeat;
-  transform: rotate(30deg) translateY(3px);
   pointer-events: none;
 }
 
-.xmas-hat nav .links:has(.nav-pill.is-off)::after {
-  top: -24px;
-  left: 14px;
-  z-index: 2;
+.xmas-hat .nav-hat i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("../img/xmas/hat.webp") center / contain no-repeat;
+  transform: rotate(30deg) translateY(3px);
 }
 
-.xmas-hat .nav-pill.is-off::after {
-  display: none;
+.xmas-hat nav .links.is-ready .nav-hat {
+  transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* the slim bar that follows the page: a little more room above the pill for the hat */
@@ -2623,9 +2629,9 @@ footer a {
 }
 
 .garland-corner {
-  top: -18px;
+  top: -26px;                          /* the drawing's corner point sits on the panel's corner */
   left: auto;
-  right: -18px;
+  right: -38px;
 }
 
 /* globe: snow falling inside the round "Brewing..." illustration (drawn by js/season.js) */
@@ -2641,5 +2647,19 @@ footer a {
   .xmas-lights .header-bar::before,
   .xmas-lights .header-bar::after {
     animation: none;
+  }
+}
+
+/* phones: a smaller corner swag that stays on screen, with room under it for the bauble */
+@media (max-width: 650px) {
+  .garland-corner {
+    top: -16px;
+    right: -14px;
+    transform: scale(0.68);
+    transform-origin: top right;
+  }
+
+  .xmas-garland .talk-panel.has-corner-sprig {
+    padding-top: 76px;
   }
 }
