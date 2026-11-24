@@ -31,6 +31,41 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://dynamics-cafe.github.io/img/preview-card.jpg">
 
+  <!-- tells Google which picture to show next to the search result (otherwise it picks a photo from the page) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://dynamics-cafe.github.io/#org",
+        "name": "Dynamics Cafe",
+        "url": "https://dynamics-cafe.github.io/",
+        "logo": "https://dynamics-cafe.github.io/img/logo-square.jpg"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://dynamics-cafe.github.io/#website",
+        "name": "Dynamics Cafe",
+        "url": "https://dynamics-cafe.github.io/",
+        "publisher": { "@id": "https://dynamics-cafe.github.io/#org" }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://dynamics-cafe.github.io/",
+        "url": "https://dynamics-cafe.github.io/",
+        "name": "Dynamics Cafe · Online seminars on dynamical systems",
+        "isPartOf": { "@id": "https://dynamics-cafe.github.io/#website" },
+        "primaryImageOfPage": { "@type": "ImageObject", "url": "https://dynamics-cafe.github.io/img/logo-square.jpg", "width": 1200, "height": 1200 },
+        "image": [
+          "https://dynamics-cafe.github.io/img/logo-square.jpg",
+          "https://dynamics-cafe.github.io/img/preview-card.jpg"
+        ]
+      }
+    ]
+  }
+  </script>
+
   <link rel="stylesheet" href="style.css?v=20261124a">
 </head>
 

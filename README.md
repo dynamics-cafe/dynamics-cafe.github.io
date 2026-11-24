@@ -51,5 +51,9 @@ When the site link is shared (Google Chat, WhatsApp, LinkedIn, email), apps show
 when a preview image is too large, apps pick a photo from the page instead. After changing it, rename
 the file or add `?v=2` to the shared link, since apps cache old previews.
 
+Google search results use `img/logo-square.jpg` (1200x1200), named in the structured data (`application/ld+json`)
+block of `index.html`. Google updates its thumbnail only when it recrawls the page; to speed it up, use
+URL Inspection, then Request indexing, in Google Search Console.
+
 `logo.png` is the full-size original (1.4 MB). The page itself uses the small copies
 `img/logo-256.webp` (header) and `img/favicon-192.png` (browser tab icon).
