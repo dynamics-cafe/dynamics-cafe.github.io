@@ -2,46 +2,61 @@
   {
     "name": "Matteo Allione",
     "role": "PhD student",
-    "affiliation": ["International School for Advanced Studies (SISSA)", "Trieste, Italy"],
+    "affiliation": [
+      "International School for Advanced Studies (SISSA)",
+      "Trieste, Italy"
+    ],
     "bio": "",
     "coffee": "",
-    "photo": "",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/matteo-allione.webp",
     "links": []
   },
   {
     "name": "Valentina Barletta",
     "role": "PhD student",
-    "affiliation": ["Biozentrum, University of Basel", "Basel, Switzerland"],
+    "affiliation": [
+      "Biozentrum, University of Basel",
+      "Basel, Switzerland"
+    ],
     "bio": "",
     "coffee": "",
-    "photo": "",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/valentina-barletta.webp",
     "links": []
   },
   {
     "name": "Ilaria Cunico",
     "role": "Postdoctoral researcher",
-    "affiliation": ["National Institute of Oceanography and Applied Geophysics (OGS)", "Trieste, Italy"],
+    "affiliation": [
+      "National Institute of Oceanography and Applied Geophysics (OGS)",
+      "Trieste, Italy"
+    ],
     "bio": "",
     "coffee": "",
-    "photo": "",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/ilaria-cunico.webp",
     "links": []
   },
   {
     "name": "Aran Dabbaghchi",
     "role": "PhD student",
-    "affiliation": ["University of Exeter", "Exeter, United Kingdom"],
+    "affiliation": [
+      "University of Exeter",
+      "Exeter, United Kingdom"
+    ],
     "bio": "",
     "coffee": "",
-    "photo": "",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/aran-dabbaghchi.webp",
     "links": []
   },
   {
     "name": "Matteo Gallo",
     "role": "PhD student",
-    "affiliation": ["National Institute of Oceanography and Applied Geophysics (OGS)", "Trieste, Italy"],
+    "affiliation": [
+      "National Institute of Oceanography and Applied Geophysics (OGS)",
+      "Trieste, Italy"
+    ],
     "bio": "",
     "coffee": "",
-    "photo": "",
+    "photo": "https://github.com/dynamics-cafe/dynamics-cafe.github.io/releases/download/speaker-photos/matteo-gallo.webp",
     "links": []
   }
 ]
