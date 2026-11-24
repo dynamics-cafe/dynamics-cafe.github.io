@@ -2525,32 +2525,31 @@ footer a {
   position: fixed;
 }
 
-.xmas-lights .header-bar::before,
-.xmas-lights .header-bar::after {
-  content: "";
+/* the bulbs and wire are drawn by js/season.js; the wire takes the place of the bottom line */
+.xmas-lights-svg {
   position: absolute;
   left: 0;
-  right: 0;
-  top: calc(100% - 2px);             /* the wire's hooks sit exactly where the bottom line was */
-  height: 26px;
-  background-repeat: round no-repeat;  /* a whole number of swags: no cut bulb at either end */
-  background-position: left top;
+  top: calc(100% - 2px);
+  overflow: visible;
   pointer-events: none;
 }
 
-.xmas-lights .header-bar::before {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cellipse%20cx%3D%2290%22%20cy%3D%2216.4%22%20rx%3D%227%22%20ry%3D%228.6%22%20fill%3D%22%23E0A93A%22%20opacity%3D%22.2%22/%3E%3Cellipse%20cx%3D%22210%22%20cy%3D%2216.4%22%20rx%3D%227%22%20ry%3D%228.6%22%20fill%3D%22%23D9782E%22%20opacity%3D%22.2%22/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cpath%20d%3D%22M0%203%20Q30%2013%2060%203%20T120%203%20T180%203%20T240%203%22%20fill%3D%22none%22%20stroke%3D%22%234E2A14%22%20stroke-width%3D%221.4%22/%3E%3Crect%20x%3D%2227.4%22%20y%3D%227%22%20width%3D%225.2%22%20height%3D%224.4%22%20rx%3D%221%22%20fill%3D%22%23C9A24A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%22.8%22/%3E%3Cellipse%20cx%3D%2230%22%20cy%3D%2216.4%22%20rx%3D%224.3%22%20ry%3D%226.1%22%20fill%3D%22%23A8323A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%2228.5%22%20cy%3D%2214.4%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%2287.4%22%20y%3D%227%22%20width%3D%225.2%22%20height%3D%224.4%22%20rx%3D%221%22%20fill%3D%22%23C9A24A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%22.8%22/%3E%3Cellipse%20cx%3D%2290%22%20cy%3D%2216.4%22%20rx%3D%224.3%22%20ry%3D%226.1%22%20fill%3D%22%23E0A93A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%2288.5%22%20cy%3D%2214.4%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22147.4%22%20y%3D%227%22%20width%3D%225.2%22%20height%3D%224.4%22%20rx%3D%221%22%20fill%3D%22%23C9A24A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%22.8%22/%3E%3Cellipse%20cx%3D%22150%22%20cy%3D%2216.4%22%20rx%3D%224.3%22%20ry%3D%226.1%22%20fill%3D%22%232F6A47%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22148.5%22%20cy%3D%2214.4%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3Crect%20x%3D%22207.4%22%20y%3D%227%22%20width%3D%225.2%22%20height%3D%224.4%22%20rx%3D%221%22%20fill%3D%22%23C9A24A%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%22.8%22/%3E%3Cellipse%20cx%3D%22210%22%20cy%3D%2216.4%22%20rx%3D%224.3%22%20ry%3D%226.1%22%20fill%3D%22%23D9782E%22%20stroke%3D%22%233A160A%22%20stroke-width%3D%221%22/%3E%3Cellipse%20cx%3D%22208.5%22%20cy%3D%2214.4%22%20rx%3D%221.1%22%20ry%3D%222%22%20fill%3D%22%23fff%22%20opacity%3D%22.6%22/%3E%3C/svg%3E");
-  animation: xmas-twinkle 2.6s ease-in-out infinite;
+.xmas-lights-svg .xl-glow {
+  animation: xmas-glow 3s ease-in-out infinite;
 }
 
-.xmas-lights .header-bar::after {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%2226%22%20viewBox%3D%220%200%20240%2026%22%3E%3Cellipse%20cx%3D%2230%22%20cy%3D%2216.4%22%20rx%3D%227%22%20ry%3D%228.6%22%20fill%3D%22%23A8323A%22%20opacity%3D%22.2%22/%3E%3Cellipse%20cx%3D%22150%22%20cy%3D%2216.4%22%20rx%3D%227%22%20ry%3D%228.6%22%20fill%3D%22%232F6A47%22%20opacity%3D%22.2%22/%3E%3C/svg%3E");
-  animation: xmas-twinkle 2.6s ease-in-out -1.3s infinite;
+.xmas-lights-svg .xl-core {
+  animation: xmas-core 3s ease-in-out infinite;
 }
 
-@keyframes xmas-twinkle {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
+@keyframes xmas-glow {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+@keyframes xmas-core {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.95; }
 }
 
 /* hat: a Santa hat worn by the dark header pill, its fur brim resting along the pill's top edge.
@@ -2634,7 +2633,27 @@ footer a {
   right: -38px;
 }
 
-/* globe: snow falling inside the round "Brewing..." illustration (drawn by js/season.js) */
+/* globe: snow falling inside the round "Brewing..." illustration (drawn by js/season.js),
+   behind a cool, glassy tint so the white flakes show */
+.xmas-globe .brew-art {
+  background: radial-gradient(circle at 50% 38%, #F7FAFC 0%, #E3ECF3 52%, #C9DAE7 100%);
+  border-color: #AFC3D3;
+  box-shadow: inset 0 -10px 22px rgba(70, 100, 130, 0.18), 0 6px 16px rgba(72, 24, 8, 0.08);
+}
+
+.xmas-globe .brew-art::after {
+  content: "";
+  position: absolute;
+  inset: 10px 18px auto auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border-top: 4px solid rgba(255, 255, 255, 0.85);
+  transform: rotate(28deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .xmas-globe-snow {
   position: absolute;
   inset: 0;
@@ -2644,8 +2663,8 @@ footer a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xmas-lights .header-bar::before,
-  .xmas-lights .header-bar::after {
+  .xmas-lights-svg .xl-glow,
+  .xmas-lights-svg .xl-core {
     animation: none;
   }
 }

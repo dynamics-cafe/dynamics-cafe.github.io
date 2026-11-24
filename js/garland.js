@@ -1,7 +1,8 @@
 /* Christmas garlands (the "garland" decoration of js/season.js).
 
    Hierarchy, so that nothing competes:
-   - the next-seminar card gets the one featured garland, the richest piece on the site;
+   - every seminar card (the Brewing card too) wears the same garland, each with its own
+     arrangement of ornaments;
    - the team page gets one garland swagged across each row of cards, with a different
      ornament hanging over each person's card;
    - the "Give a talk" panel gets a single sprig on one corner;
@@ -328,10 +329,10 @@
 
   /* ---------- 1. the featured garland: the next-seminar card ---------- */
 
-  function featured(card) {
+  function featured(card, idx = 0) {
     const W = card.clientWidth;
     if (!W) return;
-    const r = rng(4242);
+    const r = rng(4242 + idx * 131);
     const inset = 18, top = 6;
     const n = Math.max(2, Math.round((W - inset * 2) / 300));
     const anchors = Array.from({ length: n + 1 }, (_, k) => ({ x: inset + k * (W - inset * 2) / n, y: top }));
@@ -339,7 +340,7 @@
     const g = garland(anchors, sag, r, { ribbon: true, bowScale: 1.15 });
     // a curated arrangement: one main ornament at each low point, a shorter companion beside some
     const plan = ["cranberry", "star", "copperDrop", "evergreen", "cup", "bell", "finial", "bean", "copperBall", "snowflake"];
-    let hangs = "", pi = 0;
+    let hangs = "", pi = idx * 3;            // each card starts at a different point of the plan
     g.swags.forEach((sw, k) => {
       const p = sw.P(0.5);
       hangs += hang(p.x, p.y + 3, plan[pi++ % plan.length], 16 + (k % 2) * 12, k % 2 ? 0.12 : -0.12);
@@ -436,15 +437,17 @@
     const el = e.target, grid = el.classList.contains("barista-grid");
     const w = grid ? el.getBoundingClientRect().width : el.clientWidth;
     if (+el.dataset.garlandW === w) return;
-    if (grid) teamRows(el); else featured(el);
+    if (grid) teamRows(el); else featured(el, +el.dataset.garlandIdx || 0);
   }));
 
   function scan() {
-    const next = document.querySelector('.event.deck-slide[data-kind="Next seminar"]');
-    if (next && !next.querySelector(":scope > .garland-featured")) {
-      featured(next);
-      if (!next.dataset.garlandObserved) { next.dataset.garlandObserved = "1"; ro.observe(next); }
-    }
+    // every seminar card (the Brewing card too) wears the same garland, arranged differently
+    document.querySelectorAll(".event.deck-slide").forEach((card, i) => {
+      if (card.querySelector(":scope > .garland-featured")) return;
+      card.dataset.garlandIdx = i;
+      featured(card, i);
+      if (!card.dataset.garlandObserved) { card.dataset.garlandObserved = "1"; ro.observe(card); }
+    });
     const grid = document.getElementById("barista-grid");
     if (grid && grid.querySelector(".barista") && !grid.querySelector(":scope > .garland-rows")) {
       teamRows(grid);
