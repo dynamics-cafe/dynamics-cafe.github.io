@@ -830,14 +830,6 @@ footer a {
   position: relative;
 }
 
-.speaker-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  max-width: none;
-}
-
 .speaker-links {
   margin-top: 0;
 }
@@ -2053,12 +2045,11 @@ footer a {
   box-shadow: 0 4px 10px rgba(72, 24, 8, 0.12);
 }
 
-.barista-face img,
-.barista-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  max-width: none;
+.barista-face.is-photo,
+.barista-photo.is-photo {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .is-initials {

@@ -28,8 +28,11 @@ function zonedToDate(dateStr, timeStr, timeZone) {
 
 // Fill a portrait frame with any image: cover the frame, zoom around the face, keep the face a
 // little above centre, and never leave empty edges.
+// The portrait is drawn as the frame's background, not an <img>: search engines don't pick
+// background images as the site's thumbnail (or list them in image search), so a speaker's
+// face never becomes the face of the site in Google.
 function fitPortrait(frame, img) {
-  if (!img.naturalWidth) return;
+  if (!img || !img.naturalWidth) return;
   const [fx, fy] = (frame.dataset.focus || "50% 35%").split(/\s+/).map(v => parseFloat(v) / 100);
   const zoom = Math.max(1, parseFloat(frame.dataset.zoom) || 1);
   const bw = frame.clientWidth, bh = frame.clientHeight;
@@ -37,9 +40,9 @@ function fitPortrait(frame, img) {
   const w = img.naturalWidth * s, h = img.naturalHeight * s;
   const left = Math.min(0, Math.max(bw - w, bw / 2 - fx * w));
   const top = Math.min(0, Math.max(bh - h, bh * 0.42 - fy * h));
-  Object.assign(img.style, {
-    position: "absolute", width: w + "px", height: h + "px",
-    left: left + "px", top: top + "px", maxWidth: "none"
+  Object.assign(frame.style, {
+    backgroundImage: `url("${img.src}")`, backgroundRepeat: "no-repeat",
+    backgroundSize: `${w}px ${h}px`, backgroundPosition: `${left}px ${top}px`
   });
 }
 
@@ -137,7 +140,7 @@ function seminarCard(seminar, past) {
   // optional portrait: any image shape works. "photo_focus" is where the face is (% of the image),
   // "photo_zoom" zooms in around it; the frame is always filled, never left empty.
   const photo = seminar.photo
-    ? `<div class="speaker-photo" data-focus="${escapeHtml(seminar.photo_focus || "50% 35%")}" data-zoom="${escapeHtml(seminar.photo_zoom || 1)}"><img src="${escapeHtml(seminar.photo)}" alt="Portrait of ${escapeHtml(seminar.speaker)}" decoding="async"></div>`
+    ? `<div class="speaker-photo" role="img" aria-label="Portrait of ${escapeHtml(seminar.speaker)}" data-src="${escapeHtml(seminar.photo)}" data-focus="${escapeHtml(seminar.photo_focus || "50% 35%")}" data-zoom="${escapeHtml(seminar.photo_zoom || 1)}"></div>`
     : "";
 
   // links: whatever the speaker shared, plus the recording and slides when we have them
@@ -218,9 +221,11 @@ function seminarCard(seminar, past) {
 // portraits: fit to the frame once loaded (and on resize); drop the frame if the file fails to load
 function hydratePortraits(root) {
   root.querySelectorAll(".speaker-photo").forEach(frame => {
-    const img = frame.querySelector("img");
+    const img = new Image();               // loaded off the page, only to know its size
+    frame._portrait = img;
     const place = () => fitPortrait(frame, img);
     img.addEventListener("load", place);
+    img.src = frame.dataset.src;
     if (img.complete && img.naturalWidth) place();
     img.addEventListener("error", () => {
       const speaker = frame.closest(".speaker");
@@ -509,7 +514,7 @@ async function loadSeminars() {
     window.addEventListener("resize", () => {
       if (window.innerWidth === lastWidth) return;
       lastWidth = window.innerWidth;
-      track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f.querySelector("img")));
+      track.querySelectorAll(".speaker-photo").forEach(f => fitPortrait(f, f._portrait));
     });
     setupDeck(track, nextCard);
     if (window.BrewDoodle) track.querySelectorAll(".brew-art").forEach(art => window.BrewDoodle.mount(art));

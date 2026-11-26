@@ -12,18 +12,24 @@
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const initials = name => name.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
-  // round portrait, or the person's initials until a photo is added
+  // round portrait, or the person's initials until a photo is added. The photo is the element's
+  // background, not an <img>: search engines don't pick background images as the site's thumbnail.
   const face = (o, cls) => o.photo
-    ? `<span class="${cls}"><img src="${esc(o.photo)}" alt="${cls === "barista-photo" ? "Portrait of " + esc(o.name) : ""}" loading="lazy" decoding="async"></span>`
+    ? `<span class="${cls} is-photo" data-src="${esc(o.photo)}"${cls === "barista-photo" ? ` role="img" aria-label="Portrait of ${esc(o.name)}"` : ""}></span>`
     : `<span class="${cls} is-initials" aria-hidden="true">${esc(initials(o.name))}</span>`;
 
-  // a photo that fails to load falls back to the initials
-  const fallback = root => root.querySelectorAll("img").forEach((img, i) => {
+  // show each photo once loaded; one that fails to load falls back to the initials
+  const fallback = root => root.querySelectorAll(".is-photo[data-src]").forEach(holder => {
+    const img = new Image();
+    img.addEventListener("load", () => { holder.style.backgroundImage = `url("${img.src}")`; });
     img.addEventListener("error", () => {
-      const holder = img.parentElement;
+      holder.classList.remove("is-photo");
       holder.classList.add("is-initials");
-      holder.textContent = initials(img.closest("[data-name]")?.dataset.name || "");
+      holder.removeAttribute("role");
+      holder.removeAttribute("aria-label");
+      holder.textContent = initials(holder.closest("[data-name]")?.dataset.name || "");
     });
+    img.src = holder.dataset.src;
   });
 
   fetch("data/organizers.json?v=20261124b")
